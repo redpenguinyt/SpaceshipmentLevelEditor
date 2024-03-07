@@ -2,7 +2,7 @@ use sdl2::event::Event;
 use sdl2::keyboard::{Keycode, Mod};
 
 mod context;
-use context::Context;
+use context::{Context, Vec2F};
 mod renderer;
 use renderer::{Renderer, GRID_X_SIZE, GRID_Y_SIZE, PIXEL_SCALE};
 mod tick;
@@ -28,6 +28,7 @@ fn main() -> Result<(), String> {
 
     let mut game_tick = GameTime::new();
     let mut context = Context::build("../Orbits/Source/levels/level1.obl");
+    context.player.acceleration = Vec2F::new(2.5, -1.2);
 
     'running: loop {
         for event in event_pump.poll_iter() {
