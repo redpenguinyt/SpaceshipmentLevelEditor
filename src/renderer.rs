@@ -3,7 +3,7 @@ use std::f64::consts::PI;
 use sdl2::{
     gfx::primitives::DrawRenderer,
     pixels::Color,
-    rect::{Point, Rect},
+    // rect::{Point, Rect},
     render::WindowCanvas,
     video::Window,
 };

@@ -27,7 +27,7 @@ fn main() -> Result<(), String> {
     let mut event_pump = sdl_context.event_pump()?;
 
     let mut game_tick = GameTime::new();
-    let mut context = Context::build("../Orbits/Source/levels/level1.obl");
+    let mut context = Context::build("../Orbits/Source/levels/level3.obl");
     context.player.acceleration = Vec2F::new(2.5, -1.2);
 
     'running: loop {
