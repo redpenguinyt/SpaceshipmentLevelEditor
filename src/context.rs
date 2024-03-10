@@ -31,6 +31,7 @@ impl Context {
         let nums: Vec<f64> = text
             .replace('\n', " ")
             .split(' ')
+            .skip(2)
             .map(str::parse::<f64>)
             .map(|r| r.expect("Could not parse to f64"))
             .collect();
