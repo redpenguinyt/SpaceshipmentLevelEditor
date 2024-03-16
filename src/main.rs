@@ -47,9 +47,7 @@ fn main() -> Result<(), String> {
             context.event(&event);
         }
 
-        if game_tick.next_frame() {
-            context.tick();
-        };
+        context.tick();
 
         renderer.draw(&context)?;
 
