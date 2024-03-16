@@ -2,7 +2,7 @@ use sdl2::event::Event;
 use sdl2::keyboard::{Keycode, Mod};
 
 mod context;
-use context::{Context, Vec2F};
+use context::{AppState, Context, Vec2F};
 mod renderer;
 use renderer::{Renderer, GRID_X_SIZE, GRID_Y_SIZE, PIXEL_SCALE};
 mod tick;
@@ -27,8 +27,9 @@ fn main() -> Result<(), String> {
     let mut event_pump = sdl_context.event_pump()?;
 
     let mut game_tick = GameTime::new();
-    let mut context = Context::build("../Orbits/Source/levels/level3.obl");
-    context.player.acceleration = Vec2F::new(2.5, -1.2);
+    let mut context = Context::build("../Orbits/Source/levels/level4.obl");
+    context.player.acceleration = Vec2F::new(2.5, -0.8);
+    context.start_simulation();
 
     'running: loop {
         for event in event_pump.poll_iter() {
@@ -41,7 +42,7 @@ fn main() -> Result<(), String> {
                 } => break 'running,
 
                 Event::KeyDown {
-                    keycode: Some(Keycode::P),
+                    keycode: Some(Keycode::Escape),
                     ..
                 } => game_tick.state = !game_tick.state,
 
