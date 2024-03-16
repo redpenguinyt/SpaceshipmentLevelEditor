@@ -2,7 +2,7 @@ use sdl2::event::Event;
 use sdl2::keyboard::{Keycode, Mod};
 
 mod context;
-use context::{AppState, Context, Vec2F};
+use context::{Context, Vec2F};
 mod renderer;
 use renderer::{Renderer, GRID_X_SIZE, GRID_Y_SIZE, PIXEL_SCALE};
 mod tick;
@@ -41,20 +41,17 @@ fn main() -> Result<(), String> {
                     ..
                 } => break 'running,
 
-                Event::KeyDown {
-                    keycode: Some(Keycode::Escape),
-                    ..
-                } => game_tick.state = !game_tick.state,
-
                 _ => (),
             }
+
+            context.event(&event);
         }
 
         if game_tick.next_frame() {
             context.tick();
         };
 
-        renderer.draw(&context, &game_tick)?;
+        renderer.draw(&context)?;
 
         game_tick.sleep_frame();
     }

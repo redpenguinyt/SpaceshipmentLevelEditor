@@ -8,10 +8,7 @@ use sdl2::{
     video::Window,
 };
 
-use crate::{
-    context::{AppState, Context, Planet, Player, Target},
-    tick::{GameTime, Tick},
-};
+use crate::context::{AppState, Context, Planet, Player, Target};
 
 pub const GRID_X_SIZE: u32 = 400;
 pub const GRID_Y_SIZE: u32 = 240;
@@ -41,15 +38,17 @@ impl Renderer {
     //     Ok(())
     // }
 
-    fn draw_background(&mut self, game_tick: &GameTime) {
-        let colour = if matches!(game_tick.state, Tick::Playing) {
-            Color::RGB(0, 0, 0)
-        } else {
+    fn draw_background(&mut self, state: AppState) {
+        let colour = if matches!(state, AppState::Editing) {
             Color::RGB(10, 10, 10)
+        } else {
+            Color::RGB(0, 0, 0)
         };
 
         self.canvas.set_draw_color(colour);
         self.canvas.clear();
+
+        
     }
 
     fn draw_planets(&mut self, planets: &[Planet]) -> Result<(), String> {
@@ -91,18 +90,17 @@ impl Renderer {
         )
     }
 
-    pub fn draw(&mut self, context: &Context, game_tick: &GameTime) -> Result<(), String> {
-        self.draw_background(game_tick);
+    pub fn draw(&mut self, context: &Context) -> Result<(), String> {
+        self.draw_background(context.state);
 
-        if matches!(context.state, AppState::Editing) {
-
-            self.draw_planets(&context.planets)?;
-            self.draw_player(&context.player)?;
-            self.draw_target(&context.target)?;
-        } else {
+        if matches!(context.state, AppState::Flying) {
             self.draw_planets(&context.simulation.planets)?;
             self.draw_player(&context.simulation.player)?;
             self.draw_target(&context.simulation.target)?;
+        } else {
+            self.draw_planets(&context.planets)?;
+            self.draw_player(&context.player)?;
+            self.draw_target(&context.target)?;
         }
 
         self.canvas.present();

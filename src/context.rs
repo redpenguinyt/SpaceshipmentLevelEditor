@@ -1,18 +1,15 @@
 use std::{fs::File, io::Read};
 
+mod app_state;
+pub use app_state::AppState;
+
 mod simulation;
-pub use simulation::{Planet, Player, Target, Vec2F};
-
-use simulation::Simulation;
-
-pub enum AppState {
-    Editing,
-    Aiming,
-    Flying,
-}
+use sdl2::{event::Event, keyboard::Keycode};
+pub use simulation::{Planet, Player, Simulation, Target, Vec2F};
 
 pub struct Context {
     pub state: AppState,
+    pub launch_strength: f64,
     pub player: Player,
     pub target: Target,
     pub planets: Vec<Planet>,
@@ -35,12 +32,11 @@ impl Context {
 
         Self {
             state: AppState::Editing,
+            launch_strength: 2.0,
             player: Player::from_nums(&nums[0..3]),
             target: Target::from_nums(&nums[3..6]),
             planets: (0..nums[6] as usize)
-                .map(|i| {
-                    Planet::from_nums(&nums[i * 3 + 7..i * 3 + 10])
-                })
+                .map(|i| Planet::from_nums(&nums[i * 3 + 7..i * 3 + 10]))
                 .collect(),
             simulation: Simulation::empty(),
         }
@@ -53,6 +49,36 @@ impl Context {
             self.target.clone(),
             self.planets.clone(),
         );
+    }
+
+    pub fn event(&mut self, event: &Event) {
+        if matches!(
+            event,
+            Event::KeyDown {
+                keycode: Some(Keycode::Escape),
+                ..
+            }
+        ) {
+            self.state.toggle();
+        }
+
+        match self.state {
+            AppState::Editing => match event { _ => () },
+            AppState::Aiming => match event {
+                Event::KeyDown {
+                    keycode: Some(Keycode::Space),
+                    ..
+                } => self.start_simulation(),
+
+                Event::MouseWheel { y, .. } => {
+                    self.launch_strength += *y as f64 / 10.0;
+                    self.launch_strength = self.launch_strength.clamp(1.0, 3.0);
+                }
+
+                _ => (),
+            },
+            AppState::Flying => (),
+        }
     }
 
     pub fn tick(&mut self) {
