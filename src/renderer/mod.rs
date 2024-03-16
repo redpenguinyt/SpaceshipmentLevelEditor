@@ -3,11 +3,7 @@ mod fonts;
 use std::f64::consts::PI;
 
 use sdl2::{
-    gfx::primitives::DrawRenderer,
-    pixels::Color,
-    rect::Point,
-    render::WindowCanvas,
-    video::Window,
+    gfx::primitives::DrawRenderer, pixels::Color, rect::Point, render::WindowCanvas, video::Window,
 };
 
 use crate::context::{AppState, Context, Planet, Player, Target};
