@@ -29,7 +29,6 @@ fn main() -> Result<(), String> {
     let mut game_tick = GameTime::new();
     let mut context = Context::build("../Orbits/Source/levels/level4.obl");
     context.player.acceleration = Vec2F::new(2.5, -0.8);
-    context.start_simulation();
 
     'running: loop {
         for event in event_pump.poll_iter() {

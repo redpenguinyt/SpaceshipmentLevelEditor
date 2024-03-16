@@ -42,15 +42,6 @@ impl Context {
         }
     }
 
-    pub fn start_simulation(&mut self) {
-        self.state = AppState::Flying;
-        self.simulation.push(
-            self.player.clone(),
-            self.target.clone(),
-            self.planets.clone(),
-        );
-    }
-
     pub fn event(&mut self, event: &Event) {
         if matches!(
             event,
@@ -62,22 +53,35 @@ impl Context {
             self.state.toggle();
         }
 
-        match self.state {
-            AppState::Editing => match event { _ => () },
-            AppState::Aiming => match event {
+        match (self.state, event) {
+            (
+                AppState::Editing,
                 Event::KeyDown {
                     keycode: Some(Keycode::Space),
                     ..
-                } => self.start_simulation(),
+                },
+            ) => self.state = AppState::Aiming,
+            (
+                AppState::Aiming,
+                Event::KeyDown {
+                    keycode: Some(Keycode::Space),
+                    ..
+                },
+            ) => {
+                self.state = AppState::Flying;
+                self.simulation.push(
+                    self.player.clone(),
+                    self.target.clone(),
+                    self.planets.clone(),
+                );
+            }
 
-                Event::MouseWheel { y, .. } => {
-                    self.launch_strength += *y as f64 / 10.0;
-                    self.launch_strength = self.launch_strength.clamp(1.0, 3.0);
-                }
+            (AppState::Aiming, Event::MouseWheel { y, .. }) => {
+                self.launch_strength += *y as f64 / 10.0;
+                self.launch_strength = self.launch_strength.clamp(1.0, 3.0);
+            }
 
-                _ => (),
-            },
-            AppState::Flying => (),
+            _ => (),
         }
     }
 
