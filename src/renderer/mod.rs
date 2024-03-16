@@ -1,14 +1,18 @@
+mod fonts;
+
 use std::f64::consts::PI;
 
 use sdl2::{
     gfx::primitives::DrawRenderer,
     pixels::Color,
-    // rect::{Point, Rect},
+    rect::Point,
     render::WindowCanvas,
     video::Window,
 };
 
 use crate::context::{AppState, Context, Planet, Player, Target};
+
+use self::fonts::FontHandler;
 
 pub const GRID_X_SIZE: u32 = 400;
 pub const GRID_Y_SIZE: u32 = 240;
@@ -16,13 +20,17 @@ pub const PIXEL_SCALE: u32 = 4;
 
 pub struct Renderer {
     canvas: WindowCanvas,
+    font: FontHandler,
 }
 
 impl Renderer {
     pub fn new(window: Window) -> Result<Self, String> {
         let canvas = window.into_canvas().build().map_err(|e| e.to_string())?;
 
-        Ok(Self { canvas })
+        Ok(Self {
+            canvas,
+            font: FontHandler::new("assets/arcade.ttf")?,
+        })
     }
 
     // fn plot(&mut self, point: Point, color: Color) -> Result<(), String> {
@@ -38,7 +46,7 @@ impl Renderer {
     //     Ok(())
     // }
 
-    fn draw_background(&mut self, state: AppState) {
+    fn draw_background(&mut self, state: AppState) -> Result<(), String> {
         let colour = if matches!(state, AppState::Editing) {
             Color::RGB(10, 10, 10)
         } else {
@@ -48,7 +56,12 @@ impl Renderer {
         self.canvas.set_draw_color(colour);
         self.canvas.clear();
 
-        
+        self.font.draw_text(
+            &mut self.canvas,
+            &format!("{state:?}"),
+            Point::new(10, 10),
+            32,
+        )
     }
 
     fn draw_planets(&mut self, planets: &[Planet]) -> Result<(), String> {
@@ -91,7 +104,7 @@ impl Renderer {
     }
 
     pub fn draw(&mut self, context: &Context) -> Result<(), String> {
-        self.draw_background(context.state);
+        self.draw_background(context.state)?;
 
         if matches!(context.state, AppState::Flying) {
             self.draw_planets(&context.simulation.planets)?;
