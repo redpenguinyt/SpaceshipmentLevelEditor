@@ -86,9 +86,8 @@ impl Context {
     }
 
     pub fn tick(&mut self) {
-        match self.state {
-            AppState::Flying => self.simulation.tick(),
-            _ => (),
+        if matches!(self.state, AppState::Flying) {
+            self.simulation.tick();
         }
     }
 }
