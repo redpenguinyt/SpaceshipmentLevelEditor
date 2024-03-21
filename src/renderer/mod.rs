@@ -6,7 +6,7 @@ use sdl2::{
     gfx::primitives::DrawRenderer, pixels::Color, rect::Point, render::WindowCanvas, video::Window,
 };
 
-use crate::context::{AppState, Context, Planet, Player, Target};
+use crate::context::{AppState, Context, Planet, Player, Simulation, SimulationEvent, Target};
 
 use self::fonts::FontHandler;
 
@@ -99,8 +99,51 @@ impl Renderer {
         )
     }
 
+    fn draw_trajectory(
+        &mut self,
+        context: &Context,
+        count: i32,
+        spacing: i32,
+        colour: Color
+    ) -> Result<(), String> {
+        let mut simulation = Simulation::empty();
+        simulation.push(
+            context.player.clone(),
+            context.target.clone(),
+            context.planets.clone(),
+        );
+
+        let mut last_pos = simulation.player.position;
+
+        let mut has_crashed = false;
+        for _ in 0..count {
+            if has_crashed {
+                break;
+            }
+
+            for _ in 0..spacing {
+                if matches!(simulation.tick(), Some(SimulationEvent::Crashed)) {
+                    has_crashed = true;
+                    break;
+                }
+            }
+
+            self.canvas.set_draw_color(colour);
+            self.canvas
+                .draw_line(last_pos * PIXEL_SCALE as f64, simulation.player.position * PIXEL_SCALE as f64)?;
+            last_pos = simulation.player.position;
+        }
+
+        Ok(())
+    }
+
     pub fn draw(&mut self, context: &Context) -> Result<(), String> {
         self.draw_background(context.state)?;
+
+        if matches!(context.state, AppState::Aiming) {
+            self.draw_trajectory(context, 2000, 1, Color::GREY)?;
+            self.draw_trajectory(context, 15, 4, Color::WHITE)?;
+        }
 
         if matches!(context.state, AppState::Flying) {
             self.draw_planets(&context.simulation.planets)?;

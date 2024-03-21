@@ -1,5 +1,4 @@
 mod planet;
-use std::process;
 
 pub use planet::Planet;
 
@@ -14,6 +13,11 @@ pub use vec2f::Vec2F;
 
 // const G: f64 = 6.67430e-11;
 const G: f64 = 0.55;
+
+pub enum Event {
+    Crashed,
+    Won,
+}
 
 pub struct Simulation {
     pub player: Player,
@@ -37,16 +41,16 @@ impl Simulation {
         self.planets = planets;
     }
 
-    pub fn tick(&mut self) {
+    pub fn tick(&mut self) -> Option<Event> {
         if self.gravitate_player() {
-            println!("you crashed!");
-            process::exit(0);
+            return Some(Event::Crashed);
         }
 
         if self.is_touching_target() {
-            println!("level complete!");
-            process::exit(0);
+            return Some(Event::Won);
         }
+
+        None
     }
 
     /// Returns true if the player crashes

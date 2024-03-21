@@ -1,11 +1,11 @@
-use std::{fs::File, io::Read};
+use sdl2::{event::Event, keyboard::Keycode, mouse::MouseButton};
+use std::{fs::File, io::Read, process};
 
 mod app_state;
 pub use app_state::AppState;
 
 mod simulation;
-use sdl2::{event::Event, keyboard::Keycode, mouse::MouseButton};
-pub use simulation::{Planet, Player, Simulation, Target, Vec2F};
+pub use simulation::{Event as SimulationEvent, Planet, Player, Simulation, Target, Vec2F};
 
 pub struct Context {
     pub state: AppState,
@@ -92,7 +92,17 @@ impl Context {
 
     pub fn tick(&mut self) {
         if matches!(self.state, AppState::Flying) {
-            self.simulation.tick();
+            match self.simulation.tick() {
+                Some(SimulationEvent::Crashed) => {
+                    println!("you crashed!");
+                    process::exit(0);
+                }
+                Some(SimulationEvent::Won) => {
+                    println!("you won!");
+                    process::exit(0);
+                }
+                _ => (),
+            };
         }
     }
 }
