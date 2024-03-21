@@ -1,6 +1,6 @@
 use std::{
     fmt::Display,
-    ops::{Add, AddAssign, Sub},
+    ops::{Add, AddAssign, Div, Mul, Sub},
 };
 
 use sdl2::rect::Point;
@@ -43,6 +43,28 @@ impl Sub<Self> for Vec2F {
 
     fn sub(self, rhs: Self) -> Self::Output {
         Self::new(self.x - rhs.x, self.y - rhs.y)
+    }
+}
+
+impl Mul<f64> for Vec2F {
+    type Output = Self;
+
+    fn mul(self, rhs: f64) -> Self::Output {
+        Self {
+            x: self.x * rhs,
+            y: self.y * rhs,
+        }
+    }
+}
+
+impl Div<f64> for Vec2F {
+    type Output = Self;
+
+    fn div(self, rhs: f64) -> Self::Output {
+        Self {
+            x: self.x / rhs,
+            y: self.y / rhs,
+        }
     }
 }
 

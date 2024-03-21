@@ -4,7 +4,7 @@ mod app_state;
 pub use app_state::AppState;
 
 mod simulation;
-use sdl2::{event::Event, keyboard::Keycode};
+use sdl2::{event::Event, keyboard::Keycode, mouse::MouseButton};
 pub use simulation::{Planet, Player, Simulation, Target, Vec2F};
 
 pub struct Context {
@@ -61,10 +61,15 @@ impl Context {
                     ..
                 },
             ) => self.state = AppState::Aiming,
+
             (
                 AppState::Aiming,
                 Event::KeyDown {
                     keycode: Some(Keycode::Space),
+                    ..
+                }
+                | Event::MouseButtonDown {
+                    mouse_btn: MouseButton::Left,
                     ..
                 },
             ) => {
