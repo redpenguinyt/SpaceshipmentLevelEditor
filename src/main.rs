@@ -29,7 +29,7 @@ fn main() -> Result<(), String> {
     let mut event_pump = sdl_context.event_pump()?;
 
     let mut game_tick = GameTime::new();
-    let mut context = Context::build("../Orbits/Source/levels/level4.obl");
+    let mut context = Context::build("assets/level.obl");
     context.player.acceleration = Vec2F::new(2.5, -0.8);
 
     'running: loop {
@@ -56,7 +56,7 @@ fn main() -> Result<(), String> {
 
                         context.player.acceleration = normalised * launch_strength;
 
-                        println!("launch strength: {launch_strength}");
+                        // display launch strength while aiming
                     }
                 }
 
