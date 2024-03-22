@@ -21,26 +21,15 @@ pub struct Renderer {
 
 impl Renderer {
     pub fn new(window: Window) -> Result<Self, String> {
-        let canvas = window.into_canvas().build().map_err(|e| e.to_string())?;
+        let mut canvas = window.into_canvas().build().map_err(|e| e.to_string())?;
+
+        canvas.set_logical_size(GRID_X_SIZE, GRID_Y_SIZE).expect("well that failed");
 
         Ok(Self {
             canvas,
             font: FontHandler::new("assets/arcade.ttf")?,
         })
     }
-
-    // fn plot(&mut self, point: Point, color: Color) -> Result<(), String> {
-    //     self.canvas.set_draw_color(color);
-
-    //     self.canvas.fill_rect(Rect::new(
-    //         point.x * PIXEL_SCALE as i32,
-    //         point.y * PIXEL_SCALE as i32,
-    //         PIXEL_SCALE,
-    //         PIXEL_SCALE,
-    //     ))?;
-
-    //     Ok(())
-    // }
 
     fn draw_background(&mut self, state: AppState) -> Result<(), String> {
         let colour = if matches!(state, AppState::Editing) {
@@ -63,9 +52,9 @@ impl Renderer {
     fn draw_planets(&mut self, planets: &[Planet]) -> Result<(), String> {
         for planet in planets {
             self.canvas.filled_circle(
-                (planet.position.x.round() * PIXEL_SCALE as f64) as i16,
-                (planet.position.y.round() * PIXEL_SCALE as f64) as i16,
-                ((planet.mass / 12.0).round() * PIXEL_SCALE as f64) as i16,
+                (planet.position.x.round()) as i16,
+                (planet.position.y.round()) as i16,
+                ((planet.mass / 12.0).round()) as i16,
                 Color::GREY,
             )?;
         }
@@ -76,25 +65,25 @@ impl Renderer {
     fn draw_player(&mut self, player: &Player) -> Result<(), String> {
         let angle = player.acceleration.y.atan2(player.acceleration.x);
 
-        let pos_x = (player.position.x.round() * PIXEL_SCALE as f64) as i16;
-        let pos_y = (player.position.y.round() * PIXEL_SCALE as f64) as i16;
+        let pos_x = (player.position.x.round()) as i16;
+        let pos_y = (player.position.y.round()) as i16;
 
         self.canvas.filled_trigon(
-            pos_x + (30.0 * angle.cos()).round() as i16,
-            pos_y + (30.0 * angle.sin()).round() as i16,
-            pos_x + (30.0 * PI.mul_add(-0.8, angle).cos()).round() as i16,
-            pos_y + (30.0 * PI.mul_add(-0.8, angle).sin()).round() as i16,
-            pos_x + (30.0 * PI.mul_add(0.8, angle).cos()).round() as i16,
-            pos_y + (30.0 * PI.mul_add(0.8, angle).sin()).round() as i16,
+            pos_x + (8.0 * angle.cos()).round() as i16,
+            pos_y + (8.0 * angle.sin()).round() as i16,
+            pos_x + (8.0 * PI.mul_add(-0.8, angle).cos()).round() as i16,
+            pos_y + (8.0 * PI.mul_add(-0.8, angle).sin()).round() as i16,
+            pos_x + (8.0 * PI.mul_add(0.8, angle).cos()).round() as i16,
+            pos_y + (8.0 * PI.mul_add(0.8, angle).sin()).round() as i16,
             Color::WHITE,
         )
     }
 
     fn draw_target(&mut self, target: &Target) -> Result<(), String> {
         self.canvas.circle(
-            (target.position.x.round() * PIXEL_SCALE as f64) as i16,
-            (target.position.y.round() * PIXEL_SCALE as f64) as i16,
-            (target.size.round() * PIXEL_SCALE as f64) as i16,
+            (target.position.x.round()) as i16,
+            (target.position.y.round()) as i16,
+            (target.size.round()) as i16,
             Color::GREEN,
         )
     }
@@ -130,7 +119,7 @@ impl Renderer {
 
             self.canvas.set_draw_color(colour);
             self.canvas
-                .draw_line(last_pos * PIXEL_SCALE as f64, simulation.player.position * PIXEL_SCALE as f64)?;
+                .draw_line(last_pos, simulation.player.position)?;
             last_pos = simulation.player.position;
         }
 

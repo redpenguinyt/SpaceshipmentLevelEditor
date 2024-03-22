@@ -45,8 +45,8 @@ fn main() -> Result<(), String> {
                 Event::MouseMotion { x, y, .. } => {
                     if matches!(context.state, AppState::Aiming) {
                         let distance_to_mouse = Vec2F::new(
-                            (x / PIXEL_SCALE as i32) as f64 - context.player.position.x,
-                            (y / PIXEL_SCALE as i32) as f64 - context.player.position.y,
+                            x as f64 - context.player.position.x,
+                            y as f64 - context.player.position.y,
                         );
 
                         let normalised = distance_to_mouse / distance_to_mouse.magnitude();
