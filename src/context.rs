@@ -55,6 +55,13 @@ impl Context {
 
         match (self.state, event) {
             (
+                AppState::Flying,
+                Event::KeyDown {
+                    keycode: Some(Keycode::R),
+                    ..
+                },
+            )
+            | (
                 AppState::Editing,
                 Event::KeyDown {
                     keycode: Some(Keycode::Space),
