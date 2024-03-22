@@ -95,7 +95,7 @@ impl Renderer {
             (target.position.x.round() * PIXEL_SCALE as f64) as i16,
             (target.position.y.round() * PIXEL_SCALE as f64) as i16,
             (target.size.round() * PIXEL_SCALE as f64) as i16,
-            Color::GREY,
+            Color::GREEN,
         )
     }
 
