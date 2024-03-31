@@ -4,6 +4,9 @@ use std::{fs::File, io::Read, process};
 mod app_state;
 pub use app_state::AppState;
 
+mod selection;
+pub use selection::{SelectedBody, Selection};
+
 mod simulation;
 pub use simulation::{Event as SimulationEvent, Planet, Player, Simulation, Target, Vec2F};
 
@@ -13,6 +16,7 @@ pub struct Context {
     pub target: Target,
     pub planets: Vec<Planet>,
     pub simulation: Simulation,
+    pub edit_selection: Selection,
 }
 
 impl Context {
@@ -38,6 +42,7 @@ impl Context {
                 .map(|i| Planet::from_nums(&nums[i * 3 + 7..i * 3 + 10]))
                 .collect(),
             simulation: Simulation::empty(),
+            edit_selection: Selection::new(),
         }
     }
 
@@ -88,6 +93,93 @@ impl Context {
             }
 
             // Aim with the mouse
+            (AppState::Aiming, Event::MouseMotion { x, y, .. }) => {
+                if matches!(self.state, AppState::Aiming) {
+                    let distance_to_mouse =
+                        Vec2F::new(*x as f64 - self.player.pos.x, *y as f64 - self.player.pos.y);
+
+                    let normalised = distance_to_mouse / distance_to_mouse.magnitude();
+
+                    let clamped_distance = distance_to_mouse.magnitude().clamp(30.0, 90.0);
+                    let launch_strength = clamped_distance / 30.0;
+
+                    self.player.acceleration = normalised * launch_strength;
+
+                    // display launch strength while aiming
+                }
+            }
+
+            (AppState::Editing, _) => self.edit_event(event),
+
+            _ => (),
+        }
+    }
+
+    pub fn edit_event(&mut self, event: &Event) {
+        match event {
+            // Moving elements around
+            Event::MouseButtonDown {
+                mouse_btn: MouseButton::Left,
+                x,
+                y,
+                ..
+            } => 'body_select: {
+                let mouse_pos = Vec2F::new(*x as f64, *y as f64);
+
+                // Try Player
+                if self.edit_selection.try_select(
+                    mouse_pos,
+                    SelectedBody::Player,
+                    self.player.pos,
+                    14.0,
+                ) {
+                    break 'body_select;
+                }
+
+                // Try Target
+                if self.edit_selection.try_select(
+                    mouse_pos,
+                    SelectedBody::Target,
+                    self.target.pos,
+                    17.0,
+                ) {
+                    break 'body_select;
+                }
+
+                // Try planets
+                for (i, planet) in self.planets.iter().enumerate() {
+                    if self.edit_selection.try_select(
+                        mouse_pos,
+                        SelectedBody::Planet(i),
+                        planet.pos,
+                        planet.mass / 12.0,
+                    ) {
+                        break 'body_select;
+                    }
+                }
+            }
+
+            Event::MouseMotion { x, y, .. } => 'mouse_move: {
+                let selected_body_positon = match self.edit_selection.body {
+                    SelectedBody::Player => &mut self.player.pos,
+                    SelectedBody::Planet(i) => &mut self.planets[i].pos,
+                    SelectedBody::Target => &mut self.target.pos,
+                    SelectedBody::None => break 'mouse_move,
+                };
+
+                let mouse_pos = Vec2F::new(*x as f64, *y as f64);
+                let mouse_movement = mouse_pos - self.edit_selection.last_mouse_position;
+
+                *selected_body_positon += mouse_movement;
+
+                self.edit_selection.last_mouse_position = mouse_pos;
+            }
+
+            Event::MouseButtonUp {
+                mouse_btn: MouseButton::Left,
+                ..
+            } => {
+                self.edit_selection.body = SelectedBody::None;
             }
 
             _ => (),

@@ -8,8 +8,6 @@ use renderer::{Renderer, GRID_X_SIZE, GRID_Y_SIZE, PIXEL_SCALE};
 mod tick;
 use tick::GameTime;
 
-use crate::context::AppState;
-
 fn main() -> Result<(), String> {
     let sdl_context = sdl2::init()?;
     let video_subsystem = sdl_context.video()?;
@@ -41,24 +39,6 @@ fn main() -> Result<(), String> {
                     keycode: Some(Keycode::Q),
                     ..
                 } => break 'running,
-
-                Event::MouseMotion { x, y, .. } => {
-                    if matches!(context.state, AppState::Aiming) {
-                        let distance_to_mouse = Vec2F::new(
-                            x as f64 - context.player.position.x,
-                            y as f64 - context.player.position.y,
-                        );
-
-                        let normalised = distance_to_mouse / distance_to_mouse.magnitude();
-
-                        let clamped_distance = distance_to_mouse.magnitude().clamp(30.0, 90.0);
-                        let launch_strength = clamped_distance / 30.0;
-
-                        context.player.acceleration = normalised * launch_strength;
-
-                        // display launch strength while aiming
-                    }
-                }
 
                 _ => (),
             }
