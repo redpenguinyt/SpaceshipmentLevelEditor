@@ -9,7 +9,6 @@ pub use simulation::{Event as SimulationEvent, Planet, Player, Simulation, Targe
 
 pub struct Context {
     pub state: AppState,
-    pub launch_strength: f64,
     pub player: Player,
     pub target: Target,
     pub planets: Vec<Planet>,
@@ -33,7 +32,6 @@ impl Context {
 
         Self {
             state: AppState::Editing,
-            launch_strength: 2.0,
             player: Player::from_nums(&nums[0..3]),
             target: Target::from_nums(&nums[3..6]),
             planets: (0..nums[6] as usize)
