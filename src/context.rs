@@ -89,9 +89,7 @@ impl Context {
                 );
             }
 
-            (AppState::Aiming, Event::MouseWheel { y, .. }) => {
-                self.launch_strength += *y as f64 / 10.0;
-                self.launch_strength = self.launch_strength.clamp(1.0, 3.0);
+            // Aim with the mouse
             }
 
             _ => (),
