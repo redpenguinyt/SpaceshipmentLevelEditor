@@ -1,5 +1,4 @@
 mod planet;
-
 pub use planet::Planet;
 
 mod player;
@@ -56,7 +55,7 @@ impl Simulation {
     /// Returns true if the player crashes
     fn gravitate_player(&mut self) -> bool {
         for planet in &self.planets {
-            let distance = planet.position - self.player.position;
+            let distance = planet.pos - self.player.pos;
             let magnitude = distance.x.mul_add(distance.x, distance.y.powi(2));
 
             let force = G * self.player.mass * planet.mass / magnitude;
@@ -73,13 +72,13 @@ impl Simulation {
             }
         }
 
-        self.player.position += self.player.acceleration;
+        self.player.pos += self.player.acceleration;
 
         false
     }
 
     fn is_touching_target(&self) -> bool {
-        let vecdistance = self.target.position - self.player.position;
+        let vecdistance = self.target.pos - self.player.pos;
 
         let distance = vecdistance
             .x

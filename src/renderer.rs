@@ -49,8 +49,8 @@ impl Renderer {
     fn draw_planets(&mut self, planets: &[Planet]) -> Result<(), String> {
         for planet in planets {
             self.canvas.filled_circle(
-                (planet.position.x.round()) as i16,
-                (planet.position.y.round()) as i16,
+                (planet.pos.x.round()) as i16,
+                (planet.pos.y.round()) as i16,
                 ((planet.mass / 12.0).round()) as i16,
                 Color::GREY,
             )?;
@@ -62,8 +62,8 @@ impl Renderer {
     fn draw_player(&mut self, player: &Player) -> Result<(), String> {
         let angle = player.acceleration.y.atan2(player.acceleration.x);
 
-        let pos_x = (player.position.x.round()) as i16;
-        let pos_y = (player.position.y.round()) as i16;
+        let pos_x = (player.pos.x.round()) as i16;
+        let pos_y = (player.pos.y.round()) as i16;
 
         self.canvas.filled_trigon(
             pos_x + (8.0 * angle.cos()).round() as i16,
@@ -78,8 +78,8 @@ impl Renderer {
 
     fn draw_target(&mut self, target: &Target) -> Result<(), String> {
         self.canvas.circle(
-            (target.position.x.round()) as i16,
-            (target.position.y.round()) as i16,
+            (target.pos.x.round()) as i16,
+            (target.pos.y.round()) as i16,
             (target.size.round()) as i16,
             Color::GREEN,
         )
@@ -99,7 +99,7 @@ impl Renderer {
             context.planets.clone(),
         );
 
-        let mut last_pos = simulation.player.position;
+        let mut last_pos = simulation.player.pos;
 
         let mut has_crashed = false;
         for _ in 0..count {
@@ -115,9 +115,8 @@ impl Renderer {
             }
 
             self.canvas.set_draw_color(colour);
-            self.canvas
-                .draw_line(last_pos, simulation.player.position)?;
-            last_pos = simulation.player.position;
+            self.canvas.draw_line(last_pos, simulation.player.pos)?;
+            last_pos = simulation.player.pos;
         }
 
         Ok(())

@@ -3,12 +3,12 @@ use super::Vec2F;
 #[derive(Debug, Clone)]
 pub struct Target {
     pub size: f64,
-    pub position: Vec2F,
+    pub pos: Vec2F,
 }
 
 impl Target {
-    pub const fn new(size: f64, position: Vec2F) -> Self {
-        Self { size, position }
+    pub const fn new(size: f64, pos: Vec2F) -> Self {
+        Self { size, pos }
     }
 
     pub const fn from_nums(nums: &[f64]) -> Self {

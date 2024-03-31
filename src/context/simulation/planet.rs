@@ -3,12 +3,12 @@ use super::Vec2F;
 #[derive(Debug, Clone)]
 pub struct Planet {
     pub mass: f64,
-    pub position: Vec2F,
+    pub pos: Vec2F,
 }
 
 impl Planet {
-    pub const fn new(mass: f64, position: Vec2F) -> Self {
-        Self { mass, position }
+    pub const fn new(mass: f64, pos: Vec2F) -> Self {
+        Self { mass, pos }
     }
 
     pub const fn from_nums(nums: &[f64]) -> Self {

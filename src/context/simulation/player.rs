@@ -3,15 +3,15 @@ use super::Vec2F;
 #[derive(Debug, Clone)]
 pub struct Player {
     pub mass: f64,
-    pub position: Vec2F,
+    pub pos: Vec2F,
     pub acceleration: Vec2F,
 }
 
 impl Player {
-    pub const fn new(mass: f64, position: Vec2F) -> Self {
+    pub const fn new(mass: f64, pos: Vec2F) -> Self {
         Self {
             mass,
-            position,
+            pos,
             acceleration: Vec2F::ZERO,
         }
     }
