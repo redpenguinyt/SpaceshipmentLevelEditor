@@ -173,7 +173,7 @@ impl Context {
                         mouse_pos,
                         SelectedBody::Planet(i),
                         planet.pos,
-                        planet.mass / 12.0,
+                        planet.mass.abs() / 12.0,
                     ) {
                         break 'body_select;
                     }
@@ -197,8 +197,23 @@ impl Context {
             Event::MouseWheel { y, .. } => 'mouse_scroll: {
                 match self.edit_selection.body {
                     SelectedBody::Planet(i) => {
-                        self.planets[i].mass *= (*y as f64).mul_add(0.1, 1.0);
-                        self.planets[i].mass = self.planets[i].mass.max(50.0);
+                        if self.planets[i].mass.is_sign_positive() {
+                            self.planets[i].mass *= (*y as f64).mul_add(0.1, 1.0);
+
+                            if self.planets[i].mass < 50.0 {
+                                self.planets[i].mass = -50.0;
+                            } else {
+                                self.planets[i].mass = self.planets[i].mass.max(50.0);
+                            }
+                        } else {
+                            self.planets[i].mass *= (*y as f64).mul_add(-0.1, 1.0);
+
+                            if self.planets[i].mass > -50.0 {
+                                self.planets[i].mass = 50.0;
+                            } else {
+                                self.planets[i].mass = self.planets[i].mass.min(-50.0);
+                            }
+                        }
                     }
 
                     SelectedBody::Target => {

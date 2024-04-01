@@ -1,6 +1,8 @@
 use std::f64::consts::PI;
 
-use sdl2::{gfx::primitives::DrawRenderer, pixels::Color, render::WindowCanvas, video::Window};
+use sdl2::{
+    gfx::primitives::DrawRenderer, pixels::Color, render::WindowCanvas, video::Window,
+};
 
 use crate::context::{AppState, Context, Planet, Player, Simulation, Target};
 
@@ -74,12 +76,15 @@ impl Renderer {
 
     fn draw_planets(&mut self, planets: &[Planet]) -> Result<(), String> {
         for planet in planets {
-            self.canvas.filled_circle(
-                (planet.pos.x.round()) as i16,
-                (planet.pos.y.round()) as i16,
-                ((planet.mass / 12.0).round()) as i16,
-                Color::GREY,
-            )?;
+            let pos = ((planet.pos.x.round()) as i16, (planet.pos.y.round()) as i16);
+            let radius = ((planet.mass.abs() / 12.0).round()) as i16;
+
+            if planet.mass.is_sign_positive() {
+                self.canvas
+                    .filled_circle(pos.0, pos.1, radius, Color::GREY)?;
+            } else {
+                self.canvas.circle(pos.0, pos.1, radius, Color::GREY)?;
+            };
         }
 
         Ok(())
