@@ -1,4 +1,8 @@
-use sdl2::{event::Event, keyboard::{Keycode, Mod}, mouse::MouseButton};
+use sdl2::{
+    event::Event,
+    keyboard::{Keycode, Mod},
+    mouse::MouseButton,
+};
 use std::{fs::File, io::Read};
 
 mod app_state;
@@ -113,11 +117,14 @@ impl Context {
                 }
             }
 
-            (AppState::Flying, Event::KeyDown {
-                keymod: Mod::NOMOD,
-                keycode: Some(keycode),
-                ..
-            }) => {
+            (
+                AppState::Flying,
+                Event::KeyDown {
+                    keymod: Mod::NOMOD,
+                    keycode: Some(keycode),
+                    ..
+                },
+            ) => {
                 let keynum = *keycode as i32;
                 // Num1 to Num4
                 if (49..=52).contains(&keynum) {
@@ -187,6 +194,22 @@ impl Context {
                 *selected_body_positon += mouse_movement;
 
                 self.edit_selection.last_mouse_position = mouse_pos;
+            }
+
+            Event::MouseWheel { y, .. } => 'mouse_scroll: {
+                match self.edit_selection.body {
+                    SelectedBody::Planet(i) => {
+                        self.planets[i].mass *= (*y as f64).mul_add(0.1, 1.0);
+                        self.planets[i].mass = self.planets[i].mass.max(50.0);
+                    }
+
+                    SelectedBody::Target => {
+                        self.target.size *= (*y as f64).mul_add(0.1, 1.0);
+                        self.target.size = self.target.size.max(5.0);
+                    }
+
+                    _ => break 'mouse_scroll,
+                };
             }
 
             Event::MouseButtonUp {
