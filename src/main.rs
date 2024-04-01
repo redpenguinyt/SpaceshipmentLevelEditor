@@ -8,7 +8,7 @@ use renderer::{Renderer, GRID_X_SIZE, GRID_Y_SIZE};
 mod tick;
 use tick::GameTime;
 
-const INITIAL_PIXEL_SCALE: u32 = 2;
+const INITIAL_PIXEL_SCALE: u32 = 3;
 
 fn main() -> Result<(), String> {
     let sdl_context = sdl2::init()?;

@@ -13,6 +13,7 @@ pub use vec2f::Vec2F;
 // const G: f64 = 6.67430e-11;
 const G: f64 = 0.55;
 
+#[derive(Debug, Clone, Copy)]
 pub enum Event {
     Crashed,
     Won,

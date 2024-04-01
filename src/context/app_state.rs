@@ -1,8 +1,11 @@
+use super::SimulationEvent;
+
 #[derive(Debug, Clone, Copy)]
 pub enum AppState {
     Editing,
     Aiming,
     Flying,
+    GameOver(SimulationEvent),
 }
 
 impl AppState {

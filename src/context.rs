@@ -1,5 +1,5 @@
 use sdl2::{event::Event, keyboard::Keycode, mouse::MouseButton};
-use std::{fs::File, io::Read, process};
+use std::{fs::File, io::Read};
 
 mod app_state;
 pub use app_state::AppState;
@@ -188,16 +188,8 @@ impl Context {
 
     pub fn tick(&mut self) {
         if matches!(self.state, AppState::Flying) {
-            match self.simulation.tick() {
-                Some(SimulationEvent::Crashed) => {
-                    println!("you crashed!");
-                    process::exit(0);
-                }
-                Some(SimulationEvent::Won) => {
-                    println!("you won!");
-                    process::exit(0);
-                }
-                _ => (),
+            if let Some(simulation_event) = self.simulation.tick() {
+                self.state = AppState::GameOver(simulation_event);
             };
         }
     }

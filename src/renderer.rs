@@ -2,7 +2,7 @@ use std::f64::consts::PI;
 
 use sdl2::{gfx::primitives::DrawRenderer, pixels::Color, render::WindowCanvas, video::Window};
 
-use crate::context::{AppState, Context, Planet, Player, Simulation, SimulationEvent, Target};
+use crate::context::{AppState, Context, Planet, Player, Simulation, Target};
 
 pub const GRID_X_SIZE: u32 = 400;
 pub const GRID_Y_SIZE: u32 = 240;
@@ -128,7 +128,7 @@ impl Renderer {
             }
 
             for _ in 0..spacing {
-                if matches!(simulation.tick(), Some(SimulationEvent::Crashed)) {
+                if simulation.tick().is_some() {
                     has_crashed = true;
                     break;
                 }
@@ -136,6 +136,7 @@ impl Renderer {
 
             self.canvas.set_draw_color(colour);
             self.canvas.draw_line(last_pos, simulation.player.pos)?;
+
             last_pos = simulation.player.pos;
         }
 
@@ -150,7 +151,7 @@ impl Renderer {
             self.draw_trajectory(context, 15, 4, Color::WHITE)?;
         }
 
-        if matches!(context.state, AppState::Flying) {
+        if matches!(context.state, AppState::Flying | AppState::GameOver(_)) {
             self.draw_planets(&context.simulation.planets)?;
             self.draw_player(&context.simulation.player)?;
             self.draw_target(&context.simulation.target)?;
