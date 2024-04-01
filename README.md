@@ -2,6 +2,8 @@
 
 This is the source code of the level editor for my game, [Orbit Game (name WIP)](https://redpenguin777.itch.io/orbit-game)
 
+Currently, the editor opens into the last file in the levels folder (sorted alphabetically). To open a different level you'll need to rename it so that the editor finds it at the end of the folder
+
 ## Keyboard Shortcuts
 
 - `Ctrl+Q` to close the app
