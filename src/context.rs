@@ -182,7 +182,7 @@ impl Context {
 
             Event::MouseMotion { x, y, .. } => {
                 let mouse_pos = Vec2F::new(*x as f64, *y as f64);
-                let mouse_movement = mouse_pos - self.edit_selection.last_mouse_position;
+                let mouse_movement = mouse_pos - self.edit_selection.last_mouse_pos;
 
                 match self.edit_selection.body {
                     SelectedBody::Player => self.player.pos += mouse_movement,
@@ -191,7 +191,7 @@ impl Context {
                     SelectedBody::None => (),
                 };
 
-                self.edit_selection.last_mouse_position = mouse_pos;
+                self.edit_selection.last_mouse_pos = mouse_pos;
             }
 
             Event::MouseWheel { y, .. } => 'mouse_scroll: {
@@ -235,7 +235,7 @@ impl Context {
                 ..
             } => {
                 self.planets
-                    .push(Planet::new(400.0, self.edit_selection.last_mouse_position));
+                    .push(Planet::new(400.0, self.edit_selection.last_mouse_pos));
 
                 self.edit_selection.body = SelectedBody::Planet(self.planets.len() - 1);
             }

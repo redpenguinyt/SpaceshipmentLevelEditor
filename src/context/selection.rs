@@ -9,14 +9,14 @@ pub enum SelectedBody {
 
 pub struct Selection {
     pub body: SelectedBody,
-    pub last_mouse_position: Vec2F,
+    pub last_mouse_pos: Vec2F,
 }
 
 impl Selection {
     pub const fn new() -> Self {
         Self {
             body: SelectedBody::None,
-            last_mouse_position: Vec2F::ZERO,
+            last_mouse_pos: Vec2F::ZERO,
         }
     }
 
@@ -33,7 +33,7 @@ impl Selection {
         let is_selectable = distance_to_body < body_radius;
         if is_selectable {
             self.body = body;
-            self.last_mouse_position = mouse_pos;
+            self.last_mouse_pos = mouse_pos;
         }
 
         is_selectable
