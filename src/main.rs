@@ -58,16 +58,19 @@ fn main() -> Result<(), String> {
                     keycode: Some(Keycode::S),
                     ..
                 } => {
-                    context.save(true)?;
+                    context.save(false)?;
+                    println!("Saved to {}", context.level_path);
                 }
 
-                // Event::KeyDown {
-                //     keymod: Mod::LCTRLMOD | Mod::LSHIFTMOD,
-                //     keycode: Some(Keycode::S),
-                //     ..
-                // } => {
-                //     context.save(false)?;
-                // }
+                Event::KeyDown {
+                    keymod,
+                    keycode: Some(Keycode::S),
+                    ..
+                } if keymod.contains(Mod::LCTRLMOD | Mod::LSHIFTMOD) => {
+                    context.save(true)?;
+                    println!("Saved as {}", context.level_path);
+                }
+
                 _ => (),
             }
 
