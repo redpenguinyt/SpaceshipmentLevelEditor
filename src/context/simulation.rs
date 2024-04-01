@@ -59,9 +59,9 @@ impl Simulation {
             let distance = planet.pos - self.player.pos;
             let magnitude = distance.x.mul_add(distance.x, distance.y.powi(2));
 
-            let force = G * self.player.mass * planet.mass / magnitude;
+            let force = G * planet.mass / magnitude;
 
-            let acceleration = force / self.player.mass;
+            let acceleration = force;
 
             let angle = (distance.y).atan2(distance.x);
 
