@@ -44,8 +44,18 @@ impl Renderer {
     }
 
     fn draw_text(&mut self, x: i16, y: i16, text: &str, colour: Color) -> Result<(), String> {
-        for (i, c) in (0i16..).zip(text.chars()) {
-            self.canvas.character(x + 7 * i, y, c, colour)?;
+        let mut i = 0;
+        let mut line = 0;
+
+        for c in text.chars() {
+            if c == '\n' {
+                i = 0;
+                line += 1;
+                continue;
+            }
+            self.canvas.character(x + 7 * i, y + line * 10, c, colour)?;
+
+            i += 1;
         }
 
         Ok(())
@@ -160,6 +170,14 @@ impl Renderer {
             self.draw_player(&context.player)?;
             self.draw_target(&context.target)?;
         }
+
+        let helper_text = match context.state {
+            AppState::Editing => "Drag planets with mouse\nChange size by scrolling while holding\nA to spawn a new planet",
+            AppState::Aiming => "Aim with mouse\nBring mouse closer to player to lower launch strength",
+            AppState::Flying => "",
+            AppState::GameOver(_) => "Press R to restart",
+        };
+        self.draw_text(2, 12, helper_text, Color::YELLOW)?;
 
         self.canvas.present();
 
