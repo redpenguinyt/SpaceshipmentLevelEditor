@@ -180,18 +180,16 @@ impl Context {
                 }
             }
 
-            Event::MouseMotion { x, y, .. } => 'mouse_move: {
-                let selected_body_positon = match self.edit_selection.body {
-                    SelectedBody::Player => &mut self.player.pos,
-                    SelectedBody::Planet(i) => &mut self.planets[i].pos,
-                    SelectedBody::Target => &mut self.target.pos,
-                    SelectedBody::None => break 'mouse_move,
-                };
-
+            Event::MouseMotion { x, y, .. } => {
                 let mouse_pos = Vec2F::new(*x as f64, *y as f64);
                 let mouse_movement = mouse_pos - self.edit_selection.last_mouse_position;
 
-                *selected_body_positon += mouse_movement;
+                match self.edit_selection.body {
+                    SelectedBody::Player => self.player.pos += mouse_movement,
+                    SelectedBody::Planet(i) => self.planets[i].pos += mouse_movement,
+                    SelectedBody::Target => self.target.pos += mouse_movement,
+                    SelectedBody::None => (),
+                };
 
                 self.edit_selection.last_mouse_position = mouse_pos;
             }
@@ -216,6 +214,27 @@ impl Context {
                 mouse_btn: MouseButton::Left,
                 ..
             } => self.edit_selection.deselect(),
+
+            Event::KeyDown {
+                keycode: Some(Keycode::A | Keycode::N),
+                ..
+            } => {
+                self.planets
+                    .push(Planet::new(400.0, self.edit_selection.last_mouse_position));
+
+                self.edit_selection.body = SelectedBody::Planet(self.planets.len() - 1);
+            }
+
+            Event::KeyDown {
+                keycode: Some(Keycode::D | Keycode::Backspace | Keycode::X),
+                ..
+            } => {
+                if let SelectedBody::Planet(i) = self.edit_selection.body {
+                    self.planets.remove(i);
+
+                    self.edit_selection.body = SelectedBody::None;
+                }
+            }
 
             _ => (),
         }
