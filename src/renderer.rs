@@ -172,12 +172,12 @@ impl Renderer {
         }
 
         let helper_text = match context.state {
-            AppState::Editing => "Drag planets with mouse\nChange size by scrolling while holding\nA to spawn a new planet",
-            AppState::Aiming => "Aim with mouse\nBring mouse closer to player to lower launch strength",
-            AppState::Flying => "",
-            AppState::GameOver(_) => "Press R to restart",
+            AppState::Editing => String::from("Drag planets with mouse\nChange size by scrolling while holding\nA to spawn a new planet"),
+            AppState::Aiming => String::from("Aim with mouse\nBring mouse closer to player to lower launch strength"),
+            AppState::Flying => format!("Speed x{}", context.simulation_speed),
+            AppState::GameOver(_) => String::from("Press R to restart"),
         };
-        self.draw_text(2, 12, helper_text, Color::YELLOW)?;
+        self.draw_text(2, 12, &helper_text, Color::YELLOW)?;
 
         self.canvas.present();
 

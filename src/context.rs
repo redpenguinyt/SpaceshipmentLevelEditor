@@ -1,4 +1,4 @@
-use sdl2::{event::Event, keyboard::Keycode, mouse::MouseButton};
+use sdl2::{event::Event, keyboard::{Keycode, Mod}, mouse::MouseButton};
 use std::{fs::File, io::Read};
 
 mod app_state;
@@ -17,6 +17,7 @@ pub struct Context {
     pub planets: Vec<Planet>,
     pub simulation: Simulation,
     pub edit_selection: Selection,
+    pub simulation_speed: u32,
 }
 
 impl Context {
@@ -43,6 +44,7 @@ impl Context {
                 .collect(),
             simulation: Simulation::empty(),
             edit_selection: Selection::new(),
+            simulation_speed: 1,
         }
     }
 
@@ -72,6 +74,8 @@ impl Context {
                     ..
                 },
             ) => self.state = AppState::Aiming,
+
+            (AppState::Editing, _) => self.edit_event(event),
 
             (
                 AppState::Aiming,
@@ -109,7 +113,17 @@ impl Context {
                 }
             }
 
-            (AppState::Editing, _) => self.edit_event(event),
+            (AppState::Flying, Event::KeyDown {
+                keymod: Mod::NOMOD,
+                keycode: Some(keycode),
+                ..
+            }) => {
+                let keynum = *keycode as i32;
+                // Num1 to Num4
+                if (49..=52).contains(&keynum) {
+                    self.simulation_speed = keynum as u32 - 48;
+                }
+            }
 
             _ => (),
         }
@@ -188,9 +202,12 @@ impl Context {
 
     pub fn tick(&mut self) {
         if matches!(self.state, AppState::Flying) {
-            if let Some(simulation_event) = self.simulation.tick() {
-                self.state = AppState::GameOver(simulation_event);
-            };
+            for _ in 0..self.simulation_speed {
+                if let Some(simulation_event) = self.simulation.tick() {
+                    self.state = AppState::GameOver(simulation_event);
+                    break;
+                };
+            }
         }
     }
 }
