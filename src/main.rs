@@ -48,12 +48,9 @@ fn main() -> Result<(), String> {
                     keymod: Mod::LALTMOD,
                     keycode: Some(keycode),
                     ..
-                } => {
-                    let keynum = keycode as i32;
+                } if (49..=53).contains(&(keycode as i32)) => {
                     // Num1 to Num5
-                    if (49..=53).contains(&keynum) {
-                        renderer.change_scale(keynum as u32 - 48)?;
-                    }
+                    renderer.change_scale(keycode as u32 - 48)?;
                 }
 
                 Event::KeyDown {

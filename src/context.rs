@@ -8,15 +8,14 @@ mod app_state;
 pub use app_state::AppState;
 
 mod save_load;
-use save_load::{generate_new_level_path, load_level, save_level};
 pub use save_load::get_last_file_in_dir;
+use save_load::{generate_new_level_path, load_level, save_level};
 
 mod selection;
 pub use selection::{SelectedBody, Selection};
 
 mod simulation;
 pub use simulation::{Event as SimulationEvent, Planet, Player, Simulation, Target, Vec2F};
-
 
 pub struct Context {
     pub state: AppState,
@@ -127,12 +126,9 @@ impl Context {
                     keycode: Some(keycode),
                     ..
                 },
-            ) => {
-                let keynum = *keycode as i32;
+            ) if (49..=52).contains(&(*keycode as i32)) => {
                 // Num1 to Num4
-                if (49..=52).contains(&keynum) {
-                    self.simulation_speed = keynum as u32 - 48;
-                }
+                self.simulation_speed = *keycode as u32 - 48;
             }
 
             _ => (),
