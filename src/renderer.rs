@@ -61,7 +61,7 @@ impl Renderer {
         Ok(())
     }
 
-    fn draw_background(&mut self, state: AppState) -> Result<(), String> {
+    fn draw_background(&mut self, state: AppState) {
         let colour = if matches!(state, AppState::Editing) {
             Color::RGB(10, 10, 10)
         } else {
@@ -70,10 +70,6 @@ impl Renderer {
 
         self.canvas.set_draw_color(colour);
         self.canvas.clear();
-
-        self.draw_text(2, 2, &state.to_string(), Color::WHITE)?;
-
-        Ok(())
     }
 
     fn draw_planets(&mut self, planets: &[Planet]) -> Result<(), String> {
@@ -154,7 +150,7 @@ impl Renderer {
     }
 
     pub fn draw(&mut self, context: &Context) -> Result<(), String> {
-        self.draw_background(context.state)?;
+        self.draw_background(context.state);
 
         if matches!(context.state, AppState::Aiming) {
             self.draw_trajectory(context, 2000, 1, Color::GREY)?;
@@ -170,6 +166,8 @@ impl Renderer {
             self.draw_player(&context.player)?;
             self.draw_target(&context.target)?;
         }
+
+        self.draw_text(2, 2, &context.state.to_string(), Color::WHITE)?;
 
         let helper_text = match context.state {
             AppState::Editing => String::from("Drag planets with mouse\nChange size by scrolling while holding\nA to spawn a new planet"),
