@@ -28,7 +28,7 @@ pub struct Simulation {
 impl Simulation {
     pub const fn empty() -> Self {
         Self {
-            player: Player::from_nums(&[30.0, 50.0, 120.0]),
+            player: Player::new(Vec2F::new(50.0, 120.0)),
             target: Target::from_nums(&[20.0, 330.0, 120.0]),
             planets: Vec::new(),
         }

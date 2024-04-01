@@ -41,10 +41,10 @@ impl Context {
 
         Self {
             state: AppState::Editing,
-            player: Player::from_nums(&nums[0..3]),
-            target: Target::from_nums(&nums[3..6]),
-            planets: (0..nums[6] as usize)
-                .map(|i| Planet::from_nums(&nums[i * 3 + 7..i * 3 + 10]))
+            player: Player::new(Vec2F::new(nums[0], nums[1])),
+            target: Target::from_nums(&nums[2..5]),
+            planets: (0..nums[5] as usize)
+                .map(|i| Planet::from_nums(&nums[(i * 3 + 6)..(i * 3 + 9)]))
                 .collect(),
             simulation: Simulation::empty(),
             edit_selection: Selection::new(),
