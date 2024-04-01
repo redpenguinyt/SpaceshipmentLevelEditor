@@ -38,4 +38,8 @@ impl Selection {
 
         is_selectable
     }
+
+    pub fn deselect(&mut self) {
+        self.body = SelectedBody::None;
+    }
 }

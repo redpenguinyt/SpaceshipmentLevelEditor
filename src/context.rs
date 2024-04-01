@@ -215,9 +215,7 @@ impl Context {
             Event::MouseButtonUp {
                 mouse_btn: MouseButton::Left,
                 ..
-            } => {
-                self.edit_selection.body = SelectedBody::None;
-            }
+            } => self.edit_selection.deselect(),
 
             _ => (),
         }
