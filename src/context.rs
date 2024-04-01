@@ -136,7 +136,7 @@ impl Context {
         }
     }
 
-    pub fn edit_event(&mut self, event: &Event) {
+    fn edit_event(&mut self, event: &Event) {
         match event {
             // Moving elements around
             Event::MouseButtonDown {
@@ -162,7 +162,7 @@ impl Context {
                     mouse_pos,
                     SelectedBody::Target,
                     self.target.pos,
-                    17.0,
+                    self.target.size + 2.0,
                 ) {
                     break 'body_select;
                 }
@@ -194,35 +194,22 @@ impl Context {
                 self.edit_selection.last_mouse_pos = mouse_pos;
             }
 
-            Event::MouseWheel { y, .. } => 'mouse_scroll: {
-                match self.edit_selection.body {
-                    SelectedBody::Planet(i) => {
-                        if self.planets[i].mass.is_sign_positive() {
-                            self.planets[i].mass *= (*y as f64).mul_add(0.1, 1.0);
+            Event::MouseWheel { y, .. } => {
+                self.change_body_size(*y as f64);
+            }
 
-                            if self.planets[i].mass < 50.0 {
-                                self.planets[i].mass = -50.0;
-                            } else {
-                                self.planets[i].mass = self.planets[i].mass.max(50.0);
-                            }
-                        } else {
-                            self.planets[i].mass *= (*y as f64).mul_add(-0.1, 1.0);
+            Event::KeyDown {
+                keycode: Some(Keycode::Up),
+                ..
+            } => {
+                self.change_body_size(0.2);
+            }
 
-                            if self.planets[i].mass > -50.0 {
-                                self.planets[i].mass = 50.0;
-                            } else {
-                                self.planets[i].mass = self.planets[i].mass.min(-50.0);
-                            }
-                        }
-                    }
-
-                    SelectedBody::Target => {
-                        self.target.size *= (*y as f64).mul_add(0.1, 1.0);
-                        self.target.size = self.target.size.max(5.0);
-                    }
-
-                    _ => break 'mouse_scroll,
-                };
+            Event::KeyDown {
+                keycode: Some(Keycode::Down),
+                ..
+            } => {
+                self.change_body_size(-0.2);
             }
 
             Event::MouseButtonUp {
@@ -252,6 +239,65 @@ impl Context {
             }
 
             _ => (),
+        }
+    }
+
+    fn change_body_size(&mut self, change: f64) {
+        match self.edit_selection.body {
+            SelectedBody::Player => (),
+
+            SelectedBody::Target => {
+                self.change_target_size(change * 0.1);
+            }
+
+            SelectedBody::Planet(i) => {
+                self.change_planet_size(i, change * 0.1);
+            }
+
+            SelectedBody::None => {
+                // Try target
+                let distance_to_target =
+                    (self.target.pos - self.edit_selection.last_mouse_pos).magnitude();
+
+                if distance_to_target < self.target.size + 2.0 {
+                    self.change_target_size(change * 0.1);
+                }
+
+                // Try planets
+                for (i, planet) in self.planets.clone().into_iter().enumerate() {
+                    let distance_to_planet =
+                        (planet.pos - self.edit_selection.last_mouse_pos).magnitude();
+
+                    if distance_to_planet < planet.mass.abs() / 12.0 {
+                        self.change_planet_size(i, change * 0.1);
+                    }
+                }
+            }
+        };
+    }
+
+    fn change_target_size(&mut self, change: f64) {
+        self.target.size *= 1.0 + change;
+        self.target.size = self.target.size.max(5.0);
+    }
+
+    fn change_planet_size(&mut self, i: usize, change: f64) {
+        if self.planets[i].mass.is_sign_positive() {
+            self.planets[i].mass *= 1.0 + change;
+
+            if self.planets[i].mass < 50.0 {
+                self.planets[i].mass = -50.0;
+            } else {
+                self.planets[i].mass = self.planets[i].mass.max(50.0);
+            }
+        } else {
+            self.planets[i].mass *= 1.0 - change;
+
+            if self.planets[i].mass > -50.0 {
+                self.planets[i].mass = 50.0;
+            } else {
+                self.planets[i].mass = self.planets[i].mass.min(-50.0);
+            }
         }
     }
 
