@@ -59,7 +59,7 @@ impl Context {
 
         match (self.state, event) {
             (
-                AppState::Flying,
+                AppState::Flying | AppState::GameOver(_),
                 Event::KeyDown {
                     keycode: Some(Keycode::R),
                     ..
