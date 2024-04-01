@@ -71,7 +71,7 @@ impl Renderer {
         self.canvas.set_draw_color(colour);
         self.canvas.clear();
 
-        self.draw_text(2, 2, &format!("{state:?}"), Color::WHITE)?;
+        self.draw_text(2, 2, &state.to_string(), Color::WHITE)?;
 
         Ok(())
     }
