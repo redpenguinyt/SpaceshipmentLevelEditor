@@ -2,7 +2,7 @@ use sdl2::event::Event;
 use sdl2::keyboard::{Keycode, Mod};
 
 mod context;
-use context::{Context, Vec2F};
+use context::{get_last_file_in_dir, Context, Vec2F};
 mod renderer;
 use renderer::{Renderer, GRID_X_SIZE, GRID_Y_SIZE};
 mod tick;
@@ -28,8 +28,10 @@ fn main() -> Result<(), String> {
 
     let mut event_pump = sdl_context.event_pump()?;
 
+    let level_path = get_last_file_in_dir("levels/")?;
+
     let mut game_tick = GameTime::new();
-    let mut context = Context::build("assets/level.obl");
+    let mut context = Context::build(&level_path);
     context.player.acceleration = Vec2F::new(2.5, -0.8);
 
     'running: loop {
@@ -54,6 +56,21 @@ fn main() -> Result<(), String> {
                     }
                 }
 
+                Event::KeyDown {
+                    keymod: Mod::LCTRLMOD,
+                    keycode: Some(Keycode::S),
+                    ..
+                } => {
+                    context.save(true)?;
+                }
+
+                // Event::KeyDown {
+                //     keymod: Mod::LCTRLMOD | Mod::LSHIFTMOD,
+                //     keycode: Some(Keycode::S),
+                //     ..
+                // } => {
+                //     context.save(false)?;
+                // }
                 _ => (),
             }
 

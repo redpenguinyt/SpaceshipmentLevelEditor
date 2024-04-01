@@ -3,10 +3,13 @@ use sdl2::{
     keyboard::{Keycode, Mod},
     mouse::MouseButton,
 };
-use std::{fs::File, io::Read};
 
 mod app_state;
 pub use app_state::AppState;
+
+mod save_load;
+use save_load::{generate_new_level_path, load_level, save_level};
+pub use save_load::get_last_file_in_dir;
 
 mod selection;
 pub use selection::{SelectedBody, Selection};
@@ -14,8 +17,10 @@ pub use selection::{SelectedBody, Selection};
 mod simulation;
 pub use simulation::{Event as SimulationEvent, Planet, Player, Simulation, Target, Vec2F};
 
+
 pub struct Context {
     pub state: AppState,
+    pub level_path: String,
     pub player: Player,
     pub target: Target,
     pub planets: Vec<Planet>,
@@ -26,30 +31,28 @@ pub struct Context {
 
 impl Context {
     pub fn build(filepath: &str) -> Self {
-        let mut file = File::open(filepath).expect("Could not load file");
-        let mut text = String::new();
-        file.read_to_string(&mut text).expect("Could not read file");
-
-        let nums: Vec<f64> = text
-            .replace('\n', " ")
-            .split(' ')
-            .filter(|s| !s.is_empty())
-            .skip(2)
-            .map(str::parse::<f64>)
-            .map(|r| r.expect("Could not parse to f64"))
-            .collect();
+        let (player, target, planets) = load_level(filepath);
 
         Self {
             state: AppState::Editing,
-            player: Player::new(Vec2F::new(nums[0], nums[1])),
-            target: Target::from_nums(&nums[2..5]),
-            planets: (0..nums[5] as usize)
-                .map(|i| Planet::from_nums(&nums[(i * 3 + 6)..(i * 3 + 9)]))
-                .collect(),
+            level_path: String::from(filepath),
+            player,
+            target,
+            planets,
             simulation: Simulation::empty(),
             edit_selection: Selection::new(),
             simulation_speed: 1,
         }
+    }
+
+    pub fn save(&mut self, save_as: bool) -> Result<(), String> {
+        if save_as {
+            self.level_path = generate_new_level_path(&self.level_path)?;
+        };
+
+        save_level(&self.level_path, &self.player, &self.target, &self.planets)?;
+
+        Ok(())
     }
 
     pub fn event(&mut self, event: &Event) {
