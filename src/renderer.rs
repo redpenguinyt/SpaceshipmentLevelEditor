@@ -6,21 +6,41 @@ use crate::context::{AppState, Context, Planet, Player, Simulation, SimulationEv
 
 pub const GRID_X_SIZE: u32 = 400;
 pub const GRID_Y_SIZE: u32 = 240;
-pub const PIXEL_SCALE: u32 = 3;
 
 pub struct Renderer {
     canvas: WindowCanvas,
+    pixel_scale: u32,
 }
 
 impl Renderer {
-    pub fn new(window: Window) -> Result<Self, String> {
+    pub fn new(window: Window, pixel_scale: u32) -> Result<Self, String> {
         let mut canvas = window.into_canvas().build().map_err(|e| e.to_string())?;
+
+        canvas
+            .window_mut()
+            .set_size(GRID_X_SIZE * pixel_scale, GRID_Y_SIZE * pixel_scale)
+            .map_err(|e| e.to_string())?;
 
         canvas
             .set_logical_size(GRID_X_SIZE, GRID_Y_SIZE)
             .expect("well that failed");
 
-        Ok(Self { canvas })
+        Ok(Self {
+            canvas,
+            pixel_scale,
+        })
+    }
+
+    pub fn change_scale(&mut self, scale: u32) -> Result<(), String> {
+        self.pixel_scale = scale;
+
+        self.canvas
+            .window_mut()
+            .set_size(
+                GRID_X_SIZE * self.pixel_scale,
+                GRID_Y_SIZE * self.pixel_scale,
+            )
+            .map_err(|e| e.to_string())
     }
 
     fn draw_text(&mut self, x: i16, y: i16, text: &str, colour: Color) -> Result<(), String> {
