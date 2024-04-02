@@ -1,4 +1,4 @@
-use dialog::DialogBox;
+use rfd::{MessageButtons, MessageDialog, MessageLevel};
 
 mod app;
 
@@ -6,9 +6,11 @@ fn main() {
     let r = app::main();
 
     if let Err(err) = r {
-        dialog::Message::new(err)
-            .title("The editor encountered an error")
-            .show()
-            .expect("Could not display dialog box");
+        MessageDialog::new()
+            .set_title("The editor encountered an error")
+            .set_level(MessageLevel::Error)
+            .set_description(err)
+            .set_buttons(MessageButtons::Ok)
+            .show();
     }
 }
