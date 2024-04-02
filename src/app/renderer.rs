@@ -170,8 +170,10 @@ impl Renderer {
             self.draw_target(&context.target)?;
         }
 
+        // Current app state
         self.draw_text(2, 2, &context.state.to_string(), Color::WHITE)?;
 
+        // Helper text
         let helper_text = match context.state {
             AppState::Editing => String::from("Drag planets with mouse\nChange size by scrolling while holding\nA to spawn a new planet"),
             AppState::Aiming => String::from("Aim with mouse\nBring mouse closer to player to lower launch strength"),
@@ -179,6 +181,17 @@ impl Renderer {
             AppState::GameOver(_) => String::from("Press R to restart"),
         };
         self.draw_text(2, 12, &helper_text, Color::YELLOW)?;
+
+        // Current level path
+        let mut display_path = context.level_path.clone();
+        if display_path.len() > 47 {
+            let Some(split_pos) = display_path.char_indices().nth_back(40) else {
+                return Err(String::from("Failed to display path"));
+            };
+
+            display_path = format!("...{}", &display_path[split_pos.0..].trim());
+        }
+        self.draw_text(2, 230, &format!("Editing: {display_path}"), Color::GREY)?;
 
         self.canvas.present();
 
