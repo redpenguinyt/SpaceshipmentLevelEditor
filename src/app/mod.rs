@@ -106,7 +106,7 @@ pub fn main() -> Result<(), String> {
 
     let window = video_subsystem
         .window(
-            "Orbit simulator",
+            "Orbit Game Editor",
             GRID_X_SIZE * INITIAL_PIXEL_SCALE,
             GRID_Y_SIZE * INITIAL_PIXEL_SCALE,
         )
