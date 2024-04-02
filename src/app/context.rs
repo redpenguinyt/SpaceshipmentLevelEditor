@@ -57,17 +57,15 @@ impl Context {
     }
 
     pub fn event(&mut self, event: &Event) {
-        if matches!(
-            event,
-            Event::KeyDown {
-                keycode: Some(Keycode::Escape),
-                ..
-            }
-        ) {
-            self.state.toggle();
-        }
-
         match (self.state, event) {
+            (
+                _,
+                Event::KeyDown {
+                    keycode: Some(Keycode::Escape),
+                    ..
+                },
+            ) => self.state.toggle(),
+            
             (
                 AppState::Flying | AppState::GameOver(_),
                 Event::KeyDown {
