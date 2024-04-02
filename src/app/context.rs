@@ -8,8 +8,8 @@ mod app_state;
 pub use app_state::AppState;
 
 mod save_load;
-pub use save_load::get_last_file_in_dir;
 use save_load::{generate_new_level_path, load_level, save_level};
+pub use save_load::{get_last_file_in_dir, SaveMethod};
 
 mod selection;
 pub use selection::{SelectedBody, Selection};
@@ -44,9 +44,11 @@ impl Context {
         }
     }
 
-    pub fn save(&mut self, save_as: bool) -> Result<(), String> {
-        if save_as {
-            self.level_path = generate_new_level_path(&self.level_path);
+    pub fn save(&mut self, method: SaveMethod) -> Result<(), String> {
+        match method {
+            SaveMethod::ToCurrentFile => (),
+            SaveMethod::Incremental => self.level_path = generate_new_level_path(&self.level_path),
+            SaveMethod::As(path) => self.level_path = path,
         };
 
         save_level(&self.level_path, &self.player, &self.target, &self.planets)?;

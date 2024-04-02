@@ -6,6 +6,12 @@ use std::{
 
 use super::{Planet, Player, Target, Vec2F};
 
+pub enum SaveMethod {
+    ToCurrentFile,
+    Incremental,
+    As(String)
+}
+
 pub fn generate_new_level_path(old_path: &str) -> String {
     let mut reversed_filename: Vec<char> = old_path.trim_end_matches(".obl").chars().collect();
 

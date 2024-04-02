@@ -9,6 +9,8 @@ use renderer::{Renderer, GRID_X_SIZE, GRID_Y_SIZE};
 mod tick;
 use tick::GameTime;
 
+use crate::app::context::SaveMethod;
+
 const INITIAL_PIXEL_SCALE: u32 = 3;
 
 fn global_keybinds(
@@ -39,11 +41,37 @@ fn global_keybinds(
             keymod,
             keycode: Some(Keycode::S),
             ..
-        } if keymod.contains(Mod::LCTRLMOD | Mod::LSHIFTMOD) => {
+        } if keymod.contains(Mod::LCTRLMOD | Mod::LALTMOD) => {
             context.save(SaveMethod::Incremental)?;
             println!("Saved incrementally to {}", context.level_path);
         }
 
+        Event::KeyDown {
+            keymod,
+            keycode: Some(Keycode::S),
+            ..
+        } if keymod.contains(Mod::LCTRLMOD | Mod::LSHIFTMOD) => {
+            let level = dialog::FileSelection::new("Save Level As")
+                .title("Save Level As")
+                .mode(dialog::FileSelectionMode::Save)
+                .path("./levels/")
+                .show()
+                .expect("Could not display dialog box");
+
+            if let Some(l) = level {
+                let with_file_extension = if std::path::Path::new(&l)
+                    .extension()
+                    .map_or(false, |ext| ext.eq_ignore_ascii_case("obl"))
+                {
+                    l
+                } else {
+                    format!("{l}.obl")
+                };
+
+                context.save(SaveMethod::As(with_file_extension))?;
+                println!("Saved as {}", context.level_path);
+            }
+        }
 
         Event::KeyDown {
             keymod: Mod::LCTRLMOD,
