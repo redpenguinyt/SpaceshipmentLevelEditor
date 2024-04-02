@@ -46,7 +46,7 @@ impl Context {
 
     pub fn save(&mut self, save_as: bool) -> Result<(), String> {
         if save_as {
-            self.level_path = generate_new_level_path(&self.level_path)?;
+            self.level_path = generate_new_level_path(&self.level_path);
         };
 
         save_level(&self.level_path, &self.player, &self.target, &self.planets)?;
