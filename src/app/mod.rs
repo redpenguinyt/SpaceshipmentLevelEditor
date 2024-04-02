@@ -90,13 +90,6 @@ fn global_keybinds(
             }
         }
 
-        Event::KeyDown {
-            keycode: Some(Keycode::E),
-            ..
-        } => {
-            return Err(String::from("This is a test"));
-        }
-
         _ => (),
     }
 
