@@ -191,7 +191,7 @@ impl Renderer {
 
             display_path = format!("...{}", &display_path[split_pos.0..].trim());
         }
-        self.draw_text(2, 230, &format!("Editing: {display_path}"), Color::GREY)?;
+        self.draw_text(2, 230, &format!("Editing: {display_path}"), Color::WHITE)?;
 
         self.canvas.present();
 
