@@ -32,15 +32,6 @@ fn global_keybinds(
             keymod,
             keycode: Some(Keycode::S),
             ..
-        } if keymod.contains(Mod::LCTRLMOD) => {
-            context.save(SaveMethod::ToCurrentFile)?;
-            println!("Saved to {}", context.level_path);
-        }
-
-        Event::KeyDown {
-            keymod,
-            keycode: Some(Keycode::S),
-            ..
         } if keymod.contains(Mod::LCTRLMOD | Mod::LALTMOD) => {
             context.save(SaveMethod::Incremental)?;
             println!("Saved incrementally to {}", context.level_path);
@@ -67,6 +58,15 @@ fn global_keybinds(
                 context.save(SaveMethod::As(String::from(path)))?;
                 println!("Saved as {}", context.level_path);
             }
+        }
+
+        Event::KeyDown {
+            keymod,
+            keycode: Some(Keycode::S),
+            ..
+        } if keymod.contains(Mod::LCTRLMOD) => {
+            context.save(SaveMethod::ToCurrentFile)?;
+            println!("Saved to {}", context.level_path);
         }
 
         Event::KeyDown {
