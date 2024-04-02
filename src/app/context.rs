@@ -108,14 +108,16 @@ impl Context {
                     let distance_to_mouse =
                         Vec2F::new(*x as f64 - self.player.pos.x, *y as f64 - self.player.pos.y);
 
-                    let normalised = distance_to_mouse / distance_to_mouse.magnitude();
+                    let mut normalised = distance_to_mouse / distance_to_mouse.magnitude();
 
-                    let clamped_distance = distance_to_mouse.magnitude().clamp(30.0, 90.0);
-                    let launch_strength = clamped_distance / 30.0;
+                    if normalised.x.is_nan() || normalised.y.is_nan() {
+                        normalised = Vec2F::new(1.0, 0.0);
+                    }
 
-                    self.player.acceleration = normalised * launch_strength;
+                    let launch_strength = (distance_to_mouse.magnitude() - 30.0) / 30.0;
+                    let clamped_launch_strength = launch_strength.clamp(1.0, 3.0);
 
-                    // display launch strength while aiming
+                    self.player.acceleration = normalised * clamped_launch_strength;
                 }
             }
 
