@@ -1,4 +1,4 @@
-use dialog::DialogBox;
+use rfd::FileDialog;
 use sdl2::event::Event;
 use sdl2::keyboard::{Keycode, Mod};
 
@@ -51,24 +51,19 @@ fn global_keybinds(
             keycode: Some(Keycode::S),
             ..
         } if keymod.contains(Mod::LCTRLMOD | Mod::LSHIFTMOD) => {
-            let level = dialog::FileSelection::new("Save Level As")
-                .title("Save Level As")
-                .mode(dialog::FileSelectionMode::Save)
-                .path("./levels/")
-                .show()
-                .expect("Could not display dialog box");
+            let level = FileDialog::new()
+                .add_filter("Orbit Level", &["obl"])
+                .set_directory("./levels/")
+                .set_file_name(&context.level_path)
+                .set_can_create_directories(true)
+                .save_file();
 
             if let Some(l) = level {
-                let with_file_extension = if std::path::Path::new(&l)
-                    .extension()
-                    .map_or(false, |ext| ext.eq_ignore_ascii_case("obl"))
-                {
-                    l
-                } else {
-                    format!("{l}.obl")
+                let Some(path) = l.to_str() else {
+                    return Err(String::from("Path is not valid unicode"));
                 };
 
-                context.save(SaveMethod::As(with_file_extension))?;
+                context.save(SaveMethod::As(String::from(path)))?;
                 println!("Saved as {}", context.level_path);
             }
         }
@@ -78,15 +73,17 @@ fn global_keybinds(
             keycode: Some(Keycode::O),
             ..
         } => {
-            let level = dialog::FileSelection::new("Please select a level")
-                .title("Level Selection")
-                .mode(dialog::FileSelectionMode::Open)
-                .path("./levels/")
-                .show()
-                .expect("Could not display dialog box");
+            let level = FileDialog::new()
+                .add_filter("Orbit Level", &["obl"])
+                .set_directory("./levels/")
+                .set_can_create_directories(true)
+                .pick_file();
 
             if let Some(l) = level {
-                *context = Context::build(&l);
+                let Some(path) = l.to_str() else {
+                    return Err(String::from("Path is not valid unicode"));
+                };
+                *context = Context::build(path);
             }
         }
 
