@@ -3,7 +3,7 @@ use sdl2::event::Event;
 use sdl2::keyboard::{Keycode, Mod};
 
 mod context;
-use context::{get_last_file_in_dir, Context, Vec2F};
+use context::{get_last_file_in_dir, Context};
 mod renderer;
 use renderer::{Renderer, GRID_X_SIZE, GRID_Y_SIZE};
 mod tick;
@@ -69,6 +69,30 @@ pub fn main() -> Result<(), String> {
                 } if keymod.contains(Mod::LCTRLMOD | Mod::LSHIFTMOD) => {
                     context.save(true)?;
                     println!("Saved as {}", context.level_path);
+                }
+
+                Event::KeyDown {
+                    keymod: Mod::LCTRLMOD,
+                    keycode: Some(Keycode::O),
+                    ..
+                } => {
+                    let level = dialog::FileSelection::new("Please select a level")
+                        .title("Level Selection")
+                        .mode(dialog::FileSelectionMode::Open)
+                        .path("./levels/")
+                        .show()
+                        .expect("Could not display dialog box");
+
+                    if let Some(l) = level {
+                        context = Context::build(&l);
+                    }
+                }
+
+                Event::KeyDown {
+                    keycode: Some(Keycode::E),
+                    ..
+                } => {
+                    return Err(String::from("This is a test"));
                 }
 
                 _ => (),

@@ -7,6 +7,7 @@ Currently, the editor opens into the last file in the levels folder (sorted alph
 ## Keyboard Shortcuts
 
 - `Ctrl+Q` to close the app
+- `Ctrl+O` to open a level file
 - `Ctrl+S` to save to the current file
 - `Ctrl+Shift+S` to save to a new file (future `Ctrl+S` presses will save to this file)
 - `Alt+[1-5]` to set the window scale
