@@ -41,13 +41,11 @@ pub fn generate_new_level_path(old_path: &str) -> String {
         .map_err(|e| e.to_string())
         .expect("Captured number from filename could not be parsed")
         + 1;
-    let new_level_num_str = new_level_num.to_string();
 
     let new_level_path = format!(
-        "{}{}{}.obl",
+        "{}{:0>3}.obl",
         reversed_filename.iter().collect::<String>(),
-        "0".repeat(number.len() - new_level_num_str.len()),
-        new_level_num_str
+        new_level_num
     );
 
     if Path::new(&new_level_path).exists() {
