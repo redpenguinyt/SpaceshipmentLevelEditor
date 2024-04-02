@@ -2,7 +2,7 @@ use std::f64::consts::PI;
 
 use sdl2::{gfx::primitives::DrawRenderer, pixels::Color, render::WindowCanvas, video::Window};
 
-use crate::context::{AppState, Context, Planet, Player, Simulation, Target};
+use super::context::{AppState, Context, Planet, Player, Simulation, Target};
 
 pub const GRID_X_SIZE: u32 = 400;
 pub const GRID_Y_SIZE: u32 = 240;
