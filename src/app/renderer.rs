@@ -176,7 +176,8 @@ impl Renderer {
         // Helper text
         let helper_text = match context.state {
             AppState::Editing => String::from("Drag planets with mouse\nChange size by scrolling while holding\nA to spawn a new planet"),
-            AppState::Aiming => String::from("Aim with mouse\nBring mouse closer to player to lower launch strength"),
+            AppState::Aiming => format!("Launch Strength: {:.2}\nAim with mouse\nBring mouse closer to player to lower launch strength",
+            context.player.acceleration.magnitude()),
             AppState::Flying => format!("Speed x{}", context.simulation_speed),
             AppState::GameOver(_) => String::from("Press R to restart"),
         };
