@@ -11,6 +11,70 @@ use tick::GameTime;
 
 const INITIAL_PIXEL_SCALE: u32 = 3;
 
+fn global_keybinds(
+    event: &Event,
+    renderer: &mut Renderer,
+    context: &mut Context,
+) -> Result<(), String> {
+    match event {
+        Event::KeyDown {
+            keymod: Mod::LALTMOD,
+            keycode: Some(keycode),
+            ..
+        } if (49..=53).contains(&(*keycode as i32)) => {
+            // Num1 to Num5
+            renderer.change_scale(*keycode as u32 - 48)?;
+        }
+
+        Event::KeyDown {
+            keymod: Mod::LCTRLMOD,
+            keycode: Some(Keycode::S),
+            ..
+        } => {
+            context.save(SaveMethod::ToCurrentFile)?;
+            println!("Saved to {}", context.level_path);
+        }
+
+        Event::KeyDown {
+            keymod,
+            keycode: Some(Keycode::S),
+            ..
+        } if keymod.contains(Mod::LCTRLMOD | Mod::LSHIFTMOD) => {
+            context.save(SaveMethod::Incremental)?;
+            println!("Saved incrementally to {}", context.level_path);
+        }
+
+
+        Event::KeyDown {
+            keymod: Mod::LCTRLMOD,
+            keycode: Some(Keycode::O),
+            ..
+        } => {
+            let level = dialog::FileSelection::new("Please select a level")
+                .title("Level Selection")
+                .mode(dialog::FileSelectionMode::Open)
+                .path("./levels/")
+                .show()
+                .expect("Could not display dialog box");
+
+            if let Some(l) = level {
+                *context = Context::build(&l);
+            }
+        }
+
+        Event::KeyDown {
+            keycode: Some(Keycode::E),
+            ..
+        } => {
+            return Err(String::from("This is a test"));
+        }
+
+        _ => (),
+    }
+
+    Ok(())
+}
+
 pub fn main() -> Result<(), String> {
     let sdl_context = sdl2::init()?;
     let video_subsystem = sdl_context.video()?;
@@ -36,67 +100,19 @@ pub fn main() -> Result<(), String> {
 
     'running: loop {
         for event in event_pump.poll_iter() {
-            match event {
+            if matches!(
+                event,
                 Event::Quit { .. }
-                | Event::KeyDown {
-                    keymod: Mod::LCTRLMOD,
-                    keycode: Some(Keycode::Q),
-                    ..
-                } => break 'running,
-
-                Event::KeyDown {
-                    keymod: Mod::LALTMOD,
-                    keycode: Some(keycode),
-                    ..
-                } if (49..=53).contains(&(keycode as i32)) => {
-                    // Num1 to Num5
-                    renderer.change_scale(keycode as u32 - 48)?;
-                }
-
-                Event::KeyDown {
-                    keymod: Mod::LCTRLMOD,
-                    keycode: Some(Keycode::S),
-                    ..
-                } => {
-                    context.save(false)?;
-                    println!("Saved to {}", context.level_path);
-                }
-
-                Event::KeyDown {
-                    keymod,
-                    keycode: Some(Keycode::S),
-                    ..
-                } if keymod.contains(Mod::LCTRLMOD | Mod::LSHIFTMOD) => {
-                    context.save(true)?;
-                    println!("Saved as {}", context.level_path);
-                }
-
-                Event::KeyDown {
-                    keymod: Mod::LCTRLMOD,
-                    keycode: Some(Keycode::O),
-                    ..
-                } => {
-                    let level = dialog::FileSelection::new("Please select a level")
-                        .title("Level Selection")
-                        .mode(dialog::FileSelectionMode::Open)
-                        .path("./levels/")
-                        .show()
-                        .expect("Could not display dialog box");
-
-                    if let Some(l) = level {
-                        context = Context::build(&l);
+                    | Event::KeyDown {
+                        keymod: Mod::LCTRLMOD,
+                        keycode: Some(Keycode::Q),
+                        ..
                     }
-                }
-
-                Event::KeyDown {
-                    keycode: Some(Keycode::E),
-                    ..
-                } => {
-                    return Err(String::from("This is a test"));
-                }
-
-                _ => (),
+            ) {
+                break 'running;
             }
+
+            global_keybinds(&event, &mut renderer, &mut context)?;
 
             context.event(&event);
         }
