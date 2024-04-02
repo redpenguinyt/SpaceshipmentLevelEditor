@@ -65,7 +65,7 @@ impl Context {
                     ..
                 },
             ) => self.state.toggle(),
-            
+
             (
                 AppState::Flying | AppState::GameOver(_),
                 Event::KeyDown {

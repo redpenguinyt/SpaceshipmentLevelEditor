@@ -9,7 +9,7 @@ use super::{Planet, Player, Target, Vec2F};
 pub enum SaveMethod {
     ToCurrentFile,
     Incremental,
-    As(String)
+    As(String),
 }
 
 pub fn generate_new_level_path(old_path: &str) -> String {
