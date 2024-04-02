@@ -1,7 +1,7 @@
 use std::{
     fs::{self, File},
     io::{BufWriter, Read, Write},
-    path::PathBuf,
+    path::{Path, PathBuf},
 };
 
 use super::{Planet, Player, Target, Vec2F};
@@ -37,12 +37,18 @@ pub fn generate_new_level_path(old_path: &str) -> String {
         + 1;
     let new_level_num_str = new_level_num.to_string();
 
-    format!(
+    let new_level_path = format!(
         "{}{}{}.obl",
         reversed_filename.iter().collect::<String>(),
         "0".repeat(number.len() - new_level_num_str.len()),
         new_level_num_str
-    )
+    );
+
+    if Path::new(&new_level_path).exists() {
+        generate_new_level_path(&new_level_path)
+    } else {
+        new_level_path
+    }
 }
 
 pub fn save_level(
