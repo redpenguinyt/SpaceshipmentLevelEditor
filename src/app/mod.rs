@@ -20,19 +20,19 @@ fn global_keybinds(
 ) -> Result<(), String> {
     match event {
         Event::KeyDown {
-            keymod: Mod::LALTMOD,
+            keymod,
             keycode: Some(keycode),
             ..
-        } if (49..=53).contains(&(*keycode as i32)) => {
+        } if keymod.contains(Mod::LCTRLMOD) && (49..=53).contains(&(*keycode as i32)) => {
             // Num1 to Num5
             renderer.change_scale(*keycode as u32 - 48)?;
         }
 
         Event::KeyDown {
-            keymod: Mod::LCTRLMOD,
+            keymod,
             keycode: Some(Keycode::S),
             ..
-        } => {
+        } if keymod.contains(Mod::LCTRLMOD) => {
             context.save(SaveMethod::ToCurrentFile)?;
             println!("Saved to {}", context.level_path);
         }
@@ -52,6 +52,7 @@ fn global_keybinds(
             ..
         } if keymod.contains(Mod::LCTRLMOD | Mod::LSHIFTMOD) => {
             let level = FileDialog::new()
+                .set_title("Save Level as")
                 .add_filter("Orbit Level", &["obl"])
                 .set_directory("./levels/")
                 .set_file_name(&context.level_path)
@@ -69,13 +70,15 @@ fn global_keybinds(
         }
 
         Event::KeyDown {
-            keymod: Mod::LCTRLMOD,
+            keymod,
             keycode: Some(Keycode::O),
             ..
-        } => {
+        } if keymod.contains(Mod::LCTRLMOD) => {
             let level = FileDialog::new()
+                .set_title("Select Level")
                 .add_filter("Orbit Level", &["obl"])
                 .set_directory("./levels/")
+                .set_file_name(&context.level_path)
                 .set_can_create_directories(true)
                 .pick_file();
 

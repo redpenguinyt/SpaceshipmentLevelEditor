@@ -124,11 +124,11 @@ impl Context {
             (
                 AppState::Flying,
                 Event::KeyDown {
-                    keymod: Mod::NOMOD,
+                    keymod,
                     keycode: Some(keycode),
                     ..
                 },
-            ) if (49..=52).contains(&(*keycode as i32)) => {
+            ) if !keymod.contains(Mod::LALTMOD) && (49..=52).contains(&(*keycode as i32)) => {
                 // Num1 to Num4
                 self.simulation_speed = *keycode as u32 - 48;
             }
