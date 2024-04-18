@@ -65,8 +65,7 @@ impl Simulation {
 
             let angle = (distance.y).atan2(distance.x);
 
-            self.player.velocity +=
-                Vec2F::new(velocity * angle.cos(), velocity * angle.sin());
+            self.player.velocity += Vec2F::new(velocity * angle.cos(), velocity * angle.sin());
 
             if magnitude < planet.mass.powi(2) / 144.0 {
                 return true;
