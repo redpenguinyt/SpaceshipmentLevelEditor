@@ -134,7 +134,7 @@ pub fn load_level(filepath: &str) -> Result<(Player, Target, Vec<Planet>, Vec<Wa
 
     let mut nums = Vec::new();
     for num in r_nums {
-        nums.push(num.map_err(|_| String::from("Could not parse to f64"))?);
+        nums.push(num.map_err(|_| format!("Found non-number in {filepath}"))?);
     }
 
     nums.reverse();
