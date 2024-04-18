@@ -1,12 +1,21 @@
 use super::Vec2F;
 
+#[derive(Debug, Clone, Copy)]
+pub enum WallEnd {
+    Beginning,
+    End,
+}
+
+#[derive(Debug, Clone, Copy)]
 pub enum SelectedBody {
     Player,
     Target,
     Planet(usize),
+    Wall(usize, WallEnd),
     None,
 }
 
+#[derive(Debug, Clone)]
 pub struct Selection {
     pub body: SelectedBody,
     pub last_mouse_pos: Vec2F,

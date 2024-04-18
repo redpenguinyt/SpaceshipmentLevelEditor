@@ -114,16 +114,31 @@ impl Renderer {
         )
     }
 
-    fn draw_walls(&mut self, walls: &[Wall]) -> Result<(), String> {
+    fn draw_walls(&mut self, walls: &[Wall], state: AppState) -> Result<(), String> {
         for wall in walls {
             self.canvas.thick_line(
                 wall.pos1.x.round() as i16,
                 wall.pos1.y.round() as i16,
                 wall.pos2.x.round() as i16,
                 wall.pos2.y.round() as i16,
-                2,
-                Color::GREY,
+                1,
+                Color::RGB(200, 200, 200),
             )?;
+
+            if matches!(state, AppState::Editing) {
+                self.canvas.circle(
+                    wall.pos1.x.round() as i16,
+                    wall.pos1.y.round() as i16,
+                    7,
+                    Color::RGB(200, 200, 200),
+                )?;
+                self.canvas.circle(
+                    wall.pos2.x.round() as i16,
+                    wall.pos2.y.round() as i16,
+                    7,
+                    Color::RGB(200, 200, 200),
+                )?;
+            }
         }
 
         Ok(())
@@ -180,12 +195,12 @@ impl Renderer {
             self.draw_planets(&context.simulation.planets)?;
             self.draw_player(&context.simulation.player)?;
             self.draw_target(&context.simulation.target)?;
-            self.draw_walls(&context.simulation.walls)?;
+            self.draw_walls(&context.simulation.walls, context.state)?;
         } else {
             self.draw_planets(&context.planets)?;
             self.draw_player(&context.player)?;
             self.draw_target(&context.target)?;
-            self.draw_walls(&context.walls)?;
+            self.draw_walls(&context.walls, context.state)?;
         }
 
         // Current app state

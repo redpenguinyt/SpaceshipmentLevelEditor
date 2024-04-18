@@ -17,6 +17,8 @@ pub use selection::{SelectedBody, Selection};
 mod simulation;
 pub use simulation::{Event as SimulationEvent, Planet, Player, Simulation, Target, Vec2F, Wall};
 
+use self::selection::WallEnd;
+
 pub struct Context {
     pub state: AppState,
     pub level_path: String,
@@ -148,40 +150,10 @@ impl Context {
                 x,
                 y,
                 ..
-            } => 'body_select: {
+            } => {
                 let mouse_pos = Vec2F::new(*x as f64, *y as f64);
 
-                // Try Player
-                if self.edit_selection.try_select(
-                    mouse_pos,
-                    SelectedBody::Player,
-                    self.player.pos,
-                    14.0,
-                ) {
-                    break 'body_select;
-                }
-
-                // Try Target
-                if self.edit_selection.try_select(
-                    mouse_pos,
-                    SelectedBody::Target,
-                    self.target.pos,
-                    self.target.size + 2.0,
-                ) {
-                    break 'body_select;
-                }
-
-                // Try planets
-                for (i, planet) in self.planets.iter().enumerate() {
-                    if self.edit_selection.try_select(
-                        mouse_pos,
-                        SelectedBody::Planet(i),
-                        planet.pos,
-                        planet.mass.abs() / 12.0,
-                    ) {
-                        break 'body_select;
-                    }
-                }
+                self.try_select_any_body(mouse_pos);
             }
 
             Event::MouseMotion { x, y, .. } => {
@@ -192,6 +164,10 @@ impl Context {
                     SelectedBody::Player => self.player.pos += mouse_movement,
                     SelectedBody::Planet(i) => self.planets[i].pos += mouse_movement,
                     SelectedBody::Target => self.target.pos += mouse_movement,
+                    SelectedBody::Wall(i, end) => match end {
+                        WallEnd::Beginning => self.walls[i].pos1 += mouse_movement,
+                        WallEnd::End => self.walls[i].pos2 += mouse_movement,
+                    },
                     SelectedBody::None => (),
                 };
 
@@ -234,22 +210,81 @@ impl Context {
             Event::KeyDown {
                 keycode: Some(Keycode::D | Keycode::Backspace | Keycode::X),
                 ..
-            } => {
-                if let SelectedBody::Planet(i) = self.edit_selection.body {
+            } => match self.edit_selection.body {
+                SelectedBody::Planet(i) => {
                     self.planets.remove(i);
 
                     self.edit_selection.body = SelectedBody::None;
                 }
-            }
+
+                SelectedBody::Wall(i, _) => {
+                    self.walls.remove(i);
+
+                    self.edit_selection.body = SelectedBody::None;
+                }
+
+                _ => (),
+            },
 
             _ => (),
         }
     }
 
+    fn try_select_any_body(&mut self, mouse_pos: Vec2F) {
+        // Try Player
+        if self
+            .edit_selection
+            .try_select(mouse_pos, SelectedBody::Player, self.player.pos, 14.0)
+        {
+            return;
+        }
+
+        // Try Target
+        if self.edit_selection.try_select(
+            mouse_pos,
+            SelectedBody::Target,
+            self.target.pos,
+            self.target.size + 2.0,
+        ) {
+            return;
+        }
+
+        // Try walls
+        for (i, wall) in self.walls.iter().enumerate() {
+            if self.edit_selection.try_select(
+                mouse_pos,
+                SelectedBody::Wall(i, WallEnd::Beginning),
+                wall.pos1,
+                8.0,
+            ) {
+                return;
+            }
+
+            if self.edit_selection.try_select(
+                mouse_pos,
+                SelectedBody::Wall(i, WallEnd::End),
+                wall.pos2,
+                8.0,
+            ) {
+                return;
+            }
+        }
+
+        // Try planets
+        for (i, planet) in self.planets.iter().enumerate() {
+            if self.edit_selection.try_select(
+                mouse_pos,
+                SelectedBody::Planet(i),
+                planet.pos,
+                planet.mass.abs() / 12.0,
+            ) {
+                return;
+            }
+        }
+    }
+
     fn change_body_size(&mut self, change: f64) {
         match self.edit_selection.body {
-            SelectedBody::Player => (),
-
             SelectedBody::Target => {
                 self.change_target_size(change * 0.1);
             }
@@ -257,6 +292,8 @@ impl Context {
             SelectedBody::Planet(i) => {
                 self.change_planet_size(i, change * 0.1);
             }
+
+            SelectedBody::Wall(_, _) | SelectedBody::Player => (),
 
             SelectedBody::None => {
                 // Try target
