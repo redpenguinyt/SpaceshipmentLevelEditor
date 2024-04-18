@@ -16,7 +16,8 @@ Currently, the editor opens into the last file in the levels folder (sorted alph
 ### Edit Mode
 
 - Hold `RMB` to select any object to drag it around
-- `A` or `N` to create a new planet
+- `A` or `N` to spawn a new planet
+- `W` or `L` to spawn a new wall
 - `X`, `D` or `Backspace` to delete a planet while holding it
 - `Space` to enter Aim Mode
 
