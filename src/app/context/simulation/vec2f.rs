@@ -77,7 +77,7 @@ impl Div<f64> for Vec2F {
 
 impl Display for Vec2F {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "({}, {})", self.x, self.y)
+        write!(f, "{} {}", self.x, self.y)
     }
 }
 

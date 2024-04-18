@@ -1,6 +1,7 @@
 use std::{
+    fmt::{Error, Write as fmtWrite},
     fs::{self, File},
-    io::{BufWriter, Read, Write},
+    io::{BufWriter, Read, Write as ioWrite},
     path::{Path, PathBuf},
 };
 
@@ -62,10 +63,12 @@ pub fn save_level(
     player: &Player,
     target: &Target,
     planets: &[Planet],
+    walls: &[Wall],
 ) -> Result<(), String> {
     let mut buffer = BufWriter::new(File::create(filepath).map_err(|e| e.to_string())?);
 
-    let level_data = level_data_to_string(player, target, planets);
+    let level_data = level_data_to_string(player, target, planets, walls)
+        .map_err(|e| format!("Failed to convert level data to obl: {e}"))?;
     let level_bytes: Vec<u8> = level_data.bytes().collect();
 
     buffer.write_all(&level_bytes).map_err(|e| e.to_string())?;
@@ -74,29 +77,28 @@ pub fn save_level(
     Ok(())
 }
 
-fn level_data_to_string(player: &Player, target: &Target, planets: &[Planet]) -> String {
+fn level_data_to_string(
+    player: &Player,
+    target: &Target,
+    planets: &[Planet],
+    walls: &[Wall],
+) -> Result<String, Error> {
     let mut data = String::from("0 0\n");
 
-    data.push_str(&format!("{} {}\n", player.pos.x, player.pos.y));
-    data.push_str(&format!(
-        "{} {} {}\n",
-        target.size.round(),
-        target.pos.x,
-        target.pos.y
-    ));
+    writeln!(&mut data, "{} {}", player.pos.x, player.pos.y)?;
+    writeln!(&mut data, "{} {}", target.size.round(), target.pos)?;
 
-    data.push_str(&format!("{}\n", planets.len()));
-
+    writeln!(&mut data, "{}", planets.len())?;
     for planet in planets {
-        data.push_str(&format!(
-            "{} {} {}\n",
-            planet.mass.round(),
-            planet.pos.x,
-            planet.pos.y
-        ));
+        writeln!(&mut data, "{} {}", planet.mass.round(), planet.pos)?;
     }
 
-    data
+    writeln!(&mut data, "{}", walls.len())?;
+    for wall in walls {
+        writeln!(&mut data, "{} {}", wall.pos1, wall.pos2)?;
+    }
+
+    Ok(data)
 }
 
 pub fn get_last_file_in_dir(directory: &str) -> Result<String, String> {

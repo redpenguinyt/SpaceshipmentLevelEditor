@@ -55,7 +55,13 @@ impl Context {
             SaveMethod::As(path) => self.level_path = path,
         };
 
-        save_level(&self.level_path, &self.player, &self.target, &self.planets)?;
+        save_level(
+            &self.level_path,
+            &self.player,
+            &self.target,
+            &self.planets,
+            &self.walls,
+        )?;
 
         Ok(())
     }
