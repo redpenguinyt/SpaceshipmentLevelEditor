@@ -117,7 +117,7 @@ impl Context {
                     let launch_strength = (distance_to_mouse.magnitude() - 30.0) / 30.0;
                     let clamped_launch_strength = launch_strength.clamp(1.0, 3.0);
 
-                    self.player.acceleration = normalised * clamped_launch_strength;
+                    self.player.velocity = normalised * clamped_launch_strength;
                 }
             }
 

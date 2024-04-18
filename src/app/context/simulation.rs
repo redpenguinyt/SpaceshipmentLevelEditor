@@ -61,19 +61,19 @@ impl Simulation {
 
             let force = G * planet.mass / magnitude;
 
-            let acceleration = force;
+            let velocity = force;
 
             let angle = (distance.y).atan2(distance.x);
 
-            self.player.acceleration +=
-                Vec2F::new(acceleration * angle.cos(), acceleration * angle.sin());
+            self.player.velocity +=
+                Vec2F::new(velocity * angle.cos(), velocity * angle.sin());
 
             if magnitude < planet.mass.powi(2) / 144.0 {
                 return true;
             }
         }
 
-        self.player.pos += self.player.acceleration;
+        self.player.pos += self.player.velocity;
 
         false
     }

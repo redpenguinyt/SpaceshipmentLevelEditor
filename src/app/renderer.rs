@@ -89,7 +89,7 @@ impl Renderer {
     }
 
     fn draw_player(&mut self, player: &Player) -> Result<(), String> {
-        let angle = player.acceleration.y.atan2(player.acceleration.x);
+        let angle = player.velocity.y.atan2(player.velocity.x);
 
         let pos_x = (player.pos.x.round()) as i16;
         let pos_y = (player.pos.y.round()) as i16;
@@ -177,7 +177,7 @@ impl Renderer {
         let helper_text = match context.state {
             AppState::Editing => String::from("Drag planets with mouse\nChange size by scrolling while holding\nA to spawn a new planet"),
             AppState::Aiming => format!("Launch Strength: {:.2}\nAim with mouse\nBring mouse closer to player to lower launch strength",
-            context.player.acceleration.magnitude()),
+            context.player.velocity.magnitude()),
             AppState::Flying => format!("Speed x{}", context.simulation_speed),
             AppState::GameOver(_) => String::from("Press R to restart"),
         };
