@@ -7,15 +7,13 @@ use std::{
 
 use super::{simulation::Wall, Planet, Player, Target, Vec2F};
 
-const EOF_ERROR: &str = "Reached end of file early";
-
 pub enum SaveMethod {
     ToCurrentFile,
     Incremental,
     As(String),
 }
 
-pub fn generate_new_level_path(old_path: &str) -> String {
+pub fn generate_new_level_path(old_path: &str) -> Result<String, String> {
     let mut reversed_filename: Vec<char> = old_path.trim_end_matches(".obl").chars().collect();
 
     let mut number = String::new();
@@ -42,7 +40,7 @@ pub fn generate_new_level_path(old_path: &str) -> String {
     let new_level_num = number
         .parse::<u32>()
         .map_err(|e| e.to_string())
-        .expect("Captured number from filename could not be parsed")
+        .map_err(|_| "Captured number from filename could not be parsed")?
         + 1;
 
     let new_level_path = format!(
@@ -54,7 +52,7 @@ pub fn generate_new_level_path(old_path: &str) -> String {
     if Path::new(&new_level_path).exists() {
         generate_new_level_path(&new_level_path)
     } else {
-        new_level_path
+        Ok(new_level_path)
     }
 }
 
@@ -121,47 +119,57 @@ pub fn get_last_file_in_dir(directory: &str) -> Result<String, String> {
     Ok(String::from(filepath))
 }
 
-pub fn load_level(filepath: &str) -> (Player, Target, Vec<Planet>, Vec<Wall>) {
-    let mut file = File::open(filepath).expect("Could not load file");
+pub fn load_level(filepath: &str) -> Result<(Player, Target, Vec<Planet>, Vec<Wall>), String> {
+    let mut file = File::open(filepath).map_err(|_| String::from("Failed to open file"))?;
     let mut text = String::new();
-    file.read_to_string(&mut text).expect("Could not read file");
+    file.read_to_string(&mut text)
+        .map_err(|_| String::from("File is not valid UTF-8"))?;
 
     let binding = text.replace('\n', " ");
-    let mut nums = binding
+    let r_nums = binding
         .split(' ')
         .filter(|s| !s.is_empty())
         .skip(2)
-        .map(str::parse::<f64>)
-        .map(|r| r.expect("Could not parse to f64"));
+        .map(str::parse::<f64>);
 
-    (
-        Player::new(Vec2F::new(
-            nums.next().expect(EOF_ERROR),
-            nums.next().expect(EOF_ERROR),
-        )),
-        Target::from_nums(&[
-            nums.next().expect(EOF_ERROR),
-            nums.next().expect(EOF_ERROR),
-            nums.next().expect(EOF_ERROR),
-        ]),
-        (0..nums.next().expect(EOF_ERROR) as usize)
-            .map(|_| {
-                Planet::from_nums(&[
-                    nums.next().expect(EOF_ERROR),
-                    nums.next().expect(EOF_ERROR),
-                    nums.next().expect(EOF_ERROR),
-                ])
-            })
-            .collect(),
-        (0..nums.next().expect(EOF_ERROR) as usize)
-            .map(|_| {
-                Wall::from_nums(&[
-                    nums.next().expect(EOF_ERROR),
-                    nums.next().expect(EOF_ERROR),
-                    nums.next().expect(EOF_ERROR),
-                    nums.next().expect(EOF_ERROR),
-                ])
-            })
-            .collect(),
-    )
+    let mut nums = Vec::new();
+    for num in r_nums {
+        nums.push(num.map_err(|_| String::from("Could not parse to f64"))?);
+    }
+
+    nums.reverse();
+
+    let player = Player::new(Vec2F::new(pop_or_eof(&mut nums)?, pop_or_eof(&mut nums)?));
+
+    let target = Target::from_nums(&[
+        pop_or_eof(&mut nums)?,
+        pop_or_eof(&mut nums)?,
+        pop_or_eof(&mut nums)?,
+    ]);
+
+    let mut planets = Vec::new();
+    for _ in 0..pop_or_eof(&mut nums)? as usize {
+        planets.push(Planet::from_nums(&[
+            pop_or_eof(&mut nums)?,
+            pop_or_eof(&mut nums)?,
+            pop_or_eof(&mut nums)?,
+        ]));
+    }
+
+    let mut walls = Vec::new();
+    for _ in 0..pop_or_eof(&mut nums)? as usize {
+        walls.push(Wall::from_nums(&[
+            pop_or_eof(&mut nums)?,
+            pop_or_eof(&mut nums)?,
+            pop_or_eof(&mut nums)?,
+            pop_or_eof(&mut nums)?,
+        ]));
+    }
+
+    Ok((player, target, planets, walls))
+}
+
+fn pop_or_eof(nums: &mut Vec<f64>) -> Result<f64, String> {
+    nums.pop()
+        .map_or_else(|| Err(String::from("Reached end of file early")), Ok)
 }

@@ -86,7 +86,8 @@ fn global_keybinds(
                 let Some(path) = l.to_str() else {
                     return Err(String::from("Path is not valid unicode"));
                 };
-                *context = Context::build(path);
+
+                *context = Context::build(path)?;
             }
         }
 
@@ -117,7 +118,7 @@ pub fn main() -> Result<(), String> {
     let level_path = get_last_file_in_dir("levels/")?;
 
     let mut game_tick = GameTime::new();
-    let mut context = Context::build(&level_path);
+    let mut context = Context::build(&level_path)?;
 
     'running: loop {
         for event in event_pump.poll_iter() {

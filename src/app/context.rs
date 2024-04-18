@@ -32,10 +32,10 @@ pub struct Context {
 }
 
 impl Context {
-    pub fn build(filepath: &str) -> Self {
-        let (player, target, planets, walls) = load_level(filepath);
+    pub fn build(filepath: &str) -> Result<Self, String> {
+        let (player, target, planets, walls) = load_level(filepath)?;
 
-        Self {
+        Ok(Self {
             state: AppState::Editing,
             level_path: String::from(filepath),
             player,
@@ -45,13 +45,13 @@ impl Context {
             simulation: Simulation::empty(),
             edit_selection: Selection::new(),
             simulation_speed: 1,
-        }
+        })
     }
 
     pub fn save(&mut self, method: SaveMethod) -> Result<(), String> {
         match method {
             SaveMethod::ToCurrentFile => (),
-            SaveMethod::Incremental => self.level_path = generate_new_level_path(&self.level_path),
+            SaveMethod::Incremental => self.level_path = generate_new_level_path(&self.level_path)?,
             SaveMethod::As(path) => self.level_path = path,
         };
 

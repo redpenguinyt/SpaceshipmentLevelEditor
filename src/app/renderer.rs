@@ -23,7 +23,7 @@ impl Renderer {
 
         canvas
             .set_logical_size(GRID_X_SIZE, GRID_Y_SIZE)
-            .expect("well that failed");
+            .map_err(|e| e.to_string())?;
 
         Ok(Self {
             canvas,
