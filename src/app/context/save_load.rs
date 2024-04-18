@@ -148,7 +148,7 @@ pub fn load_level(filepath: &str) -> Result<(Player, Target, Vec<Planet>, Vec<Wa
     ]);
 
     let mut planets = Vec::new();
-    for _ in 0..pop_or_eof(&mut nums)? as usize {
+    for _ in 0..nums.pop().unwrap_or_default() as usize {
         planets.push(Planet::from_nums(&[
             pop_or_eof(&mut nums)?,
             pop_or_eof(&mut nums)?,
@@ -157,7 +157,7 @@ pub fn load_level(filepath: &str) -> Result<(Player, Target, Vec<Planet>, Vec<Wa
     }
 
     let mut walls = Vec::new();
-    for _ in 0..pop_or_eof(&mut nums)? as usize {
+    for _ in 0..nums.pop().unwrap_or_default() as usize {
         walls.push(Wall::from_nums(&[
             pop_or_eof(&mut nums)?,
             pop_or_eof(&mut nums)?,
