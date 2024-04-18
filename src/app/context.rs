@@ -208,6 +208,19 @@ impl Context {
             }
 
             Event::KeyDown {
+                keycode: Some(Keycode::W | Keycode::L),
+                ..
+            } => {
+                self.walls.push(Wall::new(
+                    self.edit_selection.last_mouse_pos,
+                    self.edit_selection.last_mouse_pos,
+                ));
+
+                self.edit_selection.body =
+                    SelectedBody::Wall(self.walls.len() - 1, WallEnd::Beginning);
+            }
+
+            Event::KeyDown {
                 keycode: Some(Keycode::D | Keycode::Backspace | Keycode::X),
                 ..
             } => match self.edit_selection.body {
