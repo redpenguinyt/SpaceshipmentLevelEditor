@@ -2,7 +2,7 @@ use std::f64::consts::PI;
 
 use sdl2::{gfx::primitives::DrawRenderer, pixels::Color, render::WindowCanvas, video::Window};
 
-use super::context::{AppState, Context, Planet, Player, Simulation, Target};
+use super::context::{AppState, Context, Planet, Player, Simulation, Target, Wall};
 
 pub const GRID_X_SIZE: u32 = 400;
 pub const GRID_Y_SIZE: u32 = 240;
@@ -114,6 +114,21 @@ impl Renderer {
         )
     }
 
+    fn draw_walls(&mut self, walls: &[Wall]) -> Result<(), String> {
+        for wall in walls {
+            self.canvas.thick_line(
+                wall.pos1.x.round() as i16,
+                wall.pos1.y.round() as i16,
+                wall.pos2.x.round() as i16,
+                wall.pos2.y.round() as i16,
+                2,
+                Color::GREY,
+            )?;
+        }
+
+        Ok(())
+    }
+
     fn draw_trajectory(
         &mut self,
         context: &Context,
@@ -126,6 +141,7 @@ impl Renderer {
             context.player.clone(),
             context.target.clone(),
             context.planets.clone(),
+            context.walls.clone(),
         );
 
         let mut last_pos = simulation.player.pos;
@@ -164,10 +180,12 @@ impl Renderer {
             self.draw_planets(&context.simulation.planets)?;
             self.draw_player(&context.simulation.player)?;
             self.draw_target(&context.simulation.target)?;
+            self.draw_walls(&context.simulation.walls)?;
         } else {
             self.draw_planets(&context.planets)?;
             self.draw_player(&context.player)?;
             self.draw_target(&context.target)?;
+            self.draw_walls(&context.walls)?;
         }
 
         // Current app state

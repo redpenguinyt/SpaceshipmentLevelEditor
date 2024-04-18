@@ -15,7 +15,7 @@ mod selection;
 pub use selection::{SelectedBody, Selection};
 
 mod simulation;
-pub use simulation::{Event as SimulationEvent, Planet, Player, Simulation, Target, Vec2F};
+pub use simulation::{Event as SimulationEvent, Planet, Player, Simulation, Target, Vec2F, Wall};
 
 pub struct Context {
     pub state: AppState,
@@ -23,6 +23,7 @@ pub struct Context {
     pub player: Player,
     pub target: Target,
     pub planets: Vec<Planet>,
+    pub walls: Vec<Wall>,
     pub simulation: Simulation,
     pub edit_selection: Selection,
     pub simulation_speed: u32,
@@ -30,7 +31,7 @@ pub struct Context {
 
 impl Context {
     pub fn build(filepath: &str) -> Self {
-        let (player, target, planets) = load_level(filepath);
+        let (player, target, planets, walls) = load_level(filepath);
 
         Self {
             state: AppState::Editing,
@@ -38,6 +39,7 @@ impl Context {
             player,
             target,
             planets,
+            walls,
             simulation: Simulation::empty(),
             edit_selection: Selection::new(),
             simulation_speed: 1,
@@ -99,6 +101,7 @@ impl Context {
                     self.player.clone(),
                     self.target.clone(),
                     self.planets.clone(),
+                    self.walls.clone(),
                 );
             }
 

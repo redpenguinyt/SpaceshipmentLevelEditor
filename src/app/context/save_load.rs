@@ -4,7 +4,9 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use super::{Planet, Player, Target, Vec2F};
+use super::{simulation::Wall, Planet, Player, Target, Vec2F};
+
+const EOF_ERROR: &str = "Reached end of file early";
 
 pub enum SaveMethod {
     ToCurrentFile,
@@ -117,25 +119,47 @@ pub fn get_last_file_in_dir(directory: &str) -> Result<String, String> {
     Ok(String::from(filepath))
 }
 
-pub fn load_level(filepath: &str) -> (Player, Target, Vec<Planet>) {
+pub fn load_level(filepath: &str) -> (Player, Target, Vec<Planet>, Vec<Wall>) {
     let mut file = File::open(filepath).expect("Could not load file");
     let mut text = String::new();
     file.read_to_string(&mut text).expect("Could not read file");
 
-    let nums: Vec<f64> = text
-        .replace('\n', " ")
+    let binding = text.replace('\n', " ");
+    let mut nums = binding
         .split(' ')
         .filter(|s| !s.is_empty())
         .skip(2)
         .map(str::parse::<f64>)
-        .map(|r| r.expect("Could not parse to f64"))
-        .collect();
+        .map(|r| r.expect("Could not parse to f64"));
 
     (
-        Player::new(Vec2F::new(nums[0], nums[1])),
-        Target::from_nums(&nums[2..5]),
-        (0..nums[5] as usize)
-            .map(|i| Planet::from_nums(&nums[(i * 3 + 6)..(i * 3 + 9)]))
+        Player::new(Vec2F::new(
+            nums.next().expect(EOF_ERROR),
+            nums.next().expect(EOF_ERROR),
+        )),
+        Target::from_nums(&[
+            nums.next().expect(EOF_ERROR),
+            nums.next().expect(EOF_ERROR),
+            nums.next().expect(EOF_ERROR),
+        ]),
+        (0..nums.next().expect(EOF_ERROR) as usize)
+            .map(|_| {
+                Planet::from_nums(&[
+                    nums.next().expect(EOF_ERROR),
+                    nums.next().expect(EOF_ERROR),
+                    nums.next().expect(EOF_ERROR),
+                ])
+            })
+            .collect(),
+        (0..nums.next().expect(EOF_ERROR) as usize)
+            .map(|_| {
+                Wall::from_nums(&[
+                    nums.next().expect(EOF_ERROR),
+                    nums.next().expect(EOF_ERROR),
+                    nums.next().expect(EOF_ERROR),
+                    nums.next().expect(EOF_ERROR),
+                ])
+            })
             .collect(),
     )
 }

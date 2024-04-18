@@ -1,14 +1,14 @@
 mod planet;
-pub use planet::Planet;
-
 mod player;
-pub use player::Player;
-
 mod target;
-pub use target::Target;
-
 mod vec2f;
+mod wall;
+
+pub use planet::Planet;
+pub use player::Player;
+pub use target::Target;
 pub use vec2f::Vec2F;
+pub use wall::Wall;
 
 // const G: f64 = 6.67430e-11;
 const G: f64 = 0.55;
@@ -23,6 +23,7 @@ pub struct Simulation {
     pub player: Player,
     pub target: Target,
     pub planets: Vec<Planet>,
+    pub walls: Vec<Wall>,
 }
 
 impl Simulation {
@@ -31,18 +32,20 @@ impl Simulation {
             player: Player::new(Vec2F::new(50.0, 120.0)),
             target: Target::from_nums(&[20.0, 330.0, 120.0]),
             planets: Vec::new(),
+            walls: Vec::new(),
         }
     }
 
     /// Replace the contents of the simulation with the newly passed items
-    pub fn push(&mut self, player: Player, target: Target, planets: Vec<Planet>) {
+    pub fn push(&mut self, player: Player, target: Target, planets: Vec<Planet>, walls: Vec<Wall>) {
         self.player = player;
         self.target = target;
         self.planets = planets;
+        self.walls = walls;
     }
 
     pub fn tick(&mut self) -> Option<Event> {
-        if self.gravitate_player() {
+        if self.gravitate_player() || self.is_colliding_with_walls() {
             return Some(Event::Crashed);
         }
 
@@ -73,6 +76,18 @@ impl Simulation {
         }
 
         self.player.pos += self.player.velocity;
+
+        false
+    }
+
+    fn is_colliding_with_walls(&self) -> bool {
+        let player_line = Wall::new(self.player.pos, self.player.pos - self.player.velocity);
+
+        for wall in &self.walls {
+            if wall.intersects(&player_line) {
+                return true;
+            }
+        }
 
         false
     }
