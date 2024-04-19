@@ -20,6 +20,7 @@ Currently, the editor opens into the last file in the levels folder (sorted alph
 - `W` or `L` to spawn a new wall
 - `X`, `D` or `Backspace` to delete a planet while holding it
 - `Space` to enter Aim Mode
+- `H` to toggle grab indicators (e.g. the circles around the ends of walls)
 
 While holding or hovering over a planet or the target, change its size/mass with the scroll wheel or arrow keys `Up` and `Down`. Scaling a planet down far enough will turn it into a negative mass planet, which pushes the player away instead of attracting them.
 

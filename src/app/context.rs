@@ -227,6 +227,11 @@ impl Context {
             }
 
             Event::KeyDown {
+                keycode: Some(Keycode::H),
+                ..
+            } => self.edit_selection.toggle_grab_indicators(),
+
+            Event::KeyDown {
                 keycode: Some(Keycode::D | Keycode::Backspace | Keycode::X),
                 ..
             } => match self.edit_selection.body {

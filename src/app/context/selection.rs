@@ -19,6 +19,7 @@ pub enum SelectedBody {
 pub struct Selection {
     pub body: SelectedBody,
     pub last_mouse_pos: Vec2F,
+    pub show_grab_indicators: bool,
 }
 
 impl Selection {
@@ -26,7 +27,12 @@ impl Selection {
         Self {
             body: SelectedBody::None,
             last_mouse_pos: Vec2F::ZERO,
+            show_grab_indicators: true,
         }
+    }
+
+    pub fn toggle_grab_indicators(&mut self) {
+        self.show_grab_indicators = !self.show_grab_indicators;
     }
 
     /// Attempt to select a body. Returns true if the body is actually selected
