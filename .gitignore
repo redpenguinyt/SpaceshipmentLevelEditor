@@ -1,5 +1,8 @@
 /target
-orbits_editor.zip
+Cargo.lock
+
+orbits_editor_*.zip
+/orbits_editor_linux
 orbits_editor_win/levels/*
 orbits_editor_win/orbits_editor*
-Cargo.lock
+orbits_editor_win/README.md
