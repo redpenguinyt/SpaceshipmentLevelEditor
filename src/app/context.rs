@@ -28,6 +28,7 @@ pub struct Context {
     pub walls: Vec<Wall>,
     pub simulation: Simulation,
     pub edit_selection: Selection,
+    pub show_hints: bool,
 }
 
 impl Context {
@@ -43,6 +44,7 @@ impl Context {
             walls,
             simulation: Simulation::empty(),
             edit_selection: Selection::new(),
+            show_hints: true,
         })
     }
 
@@ -66,6 +68,14 @@ impl Context {
 
     pub fn event(&mut self, event: &Event) {
         match (self.state, event) {
+            (
+                _,
+                Event::KeyDown {
+                    keycode: Some(Keycode::F1),
+                    ..
+                },
+            ) => self.show_hints = !self.show_hints,
+
             (
                 _,
                 Event::KeyDown {
