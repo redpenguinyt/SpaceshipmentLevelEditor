@@ -23,7 +23,7 @@ fn global_keybinds(
             keymod,
             keycode: Some(keycode),
             ..
-        } if keymod.contains(Mod::LCTRLMOD) && (49..=53).contains(&(*keycode as i32)) => {
+        } if keymod.contains(Mod::LALTMOD) && (49..=53).contains(&(*keycode as i32)) => {
             // Num1 to Num5
             renderer.change_scale(*keycode as u32 - 48)?;
         }
