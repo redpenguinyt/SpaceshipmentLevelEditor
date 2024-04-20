@@ -2,7 +2,7 @@ use std::f64::consts::PI;
 
 use sdl2::{gfx::primitives::DrawRenderer, pixels::Color, render::WindowCanvas, video::Window};
 
-use super::context::{AppState, Context, Planet, Player, Simulation, Target, Wall};
+use super::context::{AppState, Context, Planet, Player, Simulation, Target, Vec2F, Wall};
 
 pub const GRID_X_SIZE: u32 = 400;
 pub const GRID_Y_SIZE: u32 = 240;
@@ -196,6 +196,10 @@ impl Renderer {
             self.draw_trajectory(context, 15, 4, Color::WHITE)?;
         }
 
+        if matches!(context.state, AppState::Editing) && context.player.velocity != Vec2F::ZERO {
+            self.draw_trajectory(context, 2000, 1, Color::RGB(60, 60, 60))?;
+        }
+
         if matches!(context.state, AppState::Flying | AppState::GameOver(_)) {
             self.draw_planets(&context.simulation.planets)?;
             self.draw_player(&context.simulation.player)?;
@@ -227,7 +231,7 @@ impl Renderer {
             (true, AppState::GameOver(_)) => String::from("Press R to restart"),
 
             (false, AppState::Aiming) => format!("Launch Strength: {:.2}", context.player.velocity.magnitude()),
-            
+
             (_, _) => String::new(),
         };
         self.draw_text(2, 12, &helper_text, Color::YELLOW)?;

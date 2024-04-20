@@ -5,7 +5,7 @@ use std::{
 
 use sdl2::rect::Point;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Vec2F {
     pub x: f64,
     pub y: f64,
