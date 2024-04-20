@@ -12,6 +12,7 @@ Currently, the editor opens into the last file in the levels folder (sorted alph
 - `Ctrl+Shift+S` to save as
 - `Ctrl+Alt+S` to save incrementally (if you were working on a file `mylevel.obl`, saving incrementally will save the file as `mylevel001.obl` and `Ctrl S` will now save to this file. Pressing again will save as `mylevel002.obl`, then `mylevel003.obl` and so on)
 - `Alt+[1-5]` to set the window scale
+- `F1` to show hints!
 
 ### Edit Mode
 
