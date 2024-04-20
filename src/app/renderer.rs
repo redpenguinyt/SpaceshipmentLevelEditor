@@ -224,7 +224,7 @@ impl Renderer {
             AppState::Editing => String::from("Drag planets with mouse\nChange size by scrolling while holding\nA to spawn a new planet"),
             AppState::Aiming => format!("Launch Strength: {:.2}\nAim with mouse\nBring mouse closer to player to lower launch strength",
             context.player.velocity.magnitude()),
-            AppState::Flying => format!("Speed x{}", context.simulation_speed),
+            AppState::Flying => format!("Speed x{}", context.simulation.speed),
             AppState::GameOver(_) => String::from("Press R to restart"),
         };
         self.draw_text(2, 12, &helper_text, Color::YELLOW)?;

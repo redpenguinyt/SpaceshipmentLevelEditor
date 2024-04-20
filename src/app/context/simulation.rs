@@ -24,6 +24,7 @@ pub struct Simulation {
     pub target: Target,
     pub planets: Vec<Planet>,
     pub walls: Vec<Wall>,
+    pub speed: u32,
 }
 
 impl Simulation {
@@ -33,6 +34,7 @@ impl Simulation {
             target: Target::from_nums(&[20.0, 330.0, 120.0]),
             planets: Vec::new(),
             walls: Vec::new(),
+            speed: 1,
         }
     }
 
@@ -45,12 +47,14 @@ impl Simulation {
     }
 
     pub fn tick(&mut self) -> Option<Event> {
-        if self.gravitate_player() || self.is_colliding_with_walls() {
-            return Some(Event::Crashed);
-        }
+        for _ in 0..self.speed {
+            if self.gravitate_player() || self.is_colliding_with_walls() {
+                return Some(Event::Crashed);
+            }
 
-        if self.is_touching_target() {
-            return Some(Event::Won);
+            if self.is_touching_target() {
+                return Some(Event::Won);
+            }
         }
 
         None

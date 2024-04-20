@@ -28,7 +28,6 @@ pub struct Context {
     pub walls: Vec<Wall>,
     pub simulation: Simulation,
     pub edit_selection: Selection,
-    pub simulation_speed: u32,
 }
 
 impl Context {
@@ -44,7 +43,6 @@ impl Context {
             walls,
             simulation: Simulation::empty(),
             edit_selection: Selection::new(),
-            simulation_speed: 1,
         })
     }
 
@@ -141,7 +139,7 @@ impl Context {
                 },
             ) if !keymod.contains(Mod::LALTMOD) && (49..=52).contains(&(*keycode as i32)) => {
                 // Num1 to Num4
-                self.simulation_speed = *keycode as u32 - 48;
+                self.simulation.speed = *keycode as u32 - 48;
             }
 
             _ => (),
@@ -368,12 +366,9 @@ impl Context {
 
     pub fn tick(&mut self) {
         if matches!(self.state, AppState::Flying) {
-            for _ in 0..self.simulation_speed {
-                if let Some(simulation_event) = self.simulation.tick() {
-                    self.state = AppState::GameOver(simulation_event);
-                    break;
-                };
-            }
+            if let Some(simulation_event) = self.simulation.tick() {
+                self.state = AppState::GameOver(simulation_event);
+            };
         }
     }
 }
