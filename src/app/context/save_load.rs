@@ -1,4 +1,5 @@
 use std::{
+    ffi::OsStr,
     fmt::{Error, Write as fmtWrite},
     fs::{self, File},
     io::{BufWriter, Read, Write as ioWrite},
@@ -104,6 +105,7 @@ pub fn get_last_file_in_dir(directory: &str) -> Result<String, String> {
         .map_err(|e| e.to_string())?
         .filter_map(Result::ok)
         .map(|entry| entry.path())
+        .filter(|p| p.extension() == Some(OsStr::new("obl")))
         .collect();
 
     entries.sort();
