@@ -29,6 +29,7 @@ pub struct Context {
     pub simulation: Simulation,
     pub edit_selection: Selection,
     pub show_hints: bool,
+    pub show_background_image: bool
 }
 
 impl Context {
@@ -47,6 +48,7 @@ impl Context {
             simulation: Simulation::empty(),
             edit_selection: Selection::new(),
             show_hints: true,
+            show_background_image: true,
         })
     }
 
@@ -77,6 +79,14 @@ impl Context {
                     ..
                 },
             ) => self.show_hints = !self.show_hints,
+
+            (
+                _,
+                Event::KeyDown {
+                    keycode: Some(Keycode::B),
+                    ..
+                },
+            ) => self.show_background_image = !self.show_background_image,
 
             (
                 _,

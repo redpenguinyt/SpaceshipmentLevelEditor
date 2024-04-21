@@ -1,6 +1,9 @@
 use std::f64::consts::PI;
 
-use sdl2::{gfx::primitives::DrawRenderer, pixels::Color, render::WindowCanvas, video::Window};
+use sdl2::{
+    gfx::primitives::DrawRenderer, image::LoadTexture, pixels::Color, rect::Rect,
+    render::WindowCanvas, video::Window,
+};
 
 use super::context::{AppState, Context, Planet, Player, Simulation, Target, Vec2F, Wall};
 
@@ -61,7 +64,11 @@ impl Renderer {
         Ok(())
     }
 
-    fn draw_background(&mut self, state: AppState) {
+    fn draw_background(
+        &mut self,
+        state: AppState,
+        background_path: Option<String>,
+    ) -> Result<(), String> {
         let colour = if matches!(state, AppState::Editing) {
             Color::RGB(10, 10, 10)
         } else {
@@ -70,6 +77,25 @@ impl Renderer {
 
         self.canvas.set_draw_color(colour);
         self.canvas.clear();
+
+        if let Some(bg_path) = background_path {
+            let texture_creator = self.canvas.texture_creator();
+            let load_texture = texture_creator.load_texture(&bg_path);
+
+            match load_texture {
+                Ok(texture) => {
+                    self.canvas
+                        .copy(&texture, Rect::new(0, 0, GRID_X_SIZE, GRID_Y_SIZE), None)?;
+                }
+                Err(e) => {
+                    if !e.contains("Couldn't open ") {
+                        println!("Background image not loaded successfully: {e}");
+                    }
+                }
+            }
+        }
+
+        Ok(())
     }
 
     fn draw_planets(&mut self, planets: &[Planet]) -> Result<(), String> {
@@ -189,7 +215,11 @@ impl Renderer {
     }
 
     pub fn draw(&mut self, context: &Context) -> Result<(), String> {
-        self.draw_background(context.state);
+        let image_background_path = context
+            .show_background_image
+            .then(|| context.level_path.replace("obl", "png"));
+
+        self.draw_background(context.state, image_background_path)?;
 
         if matches!(context.state, AppState::Aiming) {
             self.draw_trajectory(context, 2000, 1, Color::GREY)?;
