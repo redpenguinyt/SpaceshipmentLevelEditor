@@ -47,18 +47,8 @@ impl Renderer {
     }
 
     fn draw_text(&mut self, x: i16, y: i16, text: &str, colour: Color) -> Result<(), String> {
-        let mut i = 0;
-        let mut line = 0;
-
-        for c in text.chars() {
-            if c == '\n' {
-                i = 0;
-                line += 1;
-                continue;
-            }
-            self.canvas.character(x + 7 * i, y + line * 10, c, colour)?;
-
-            i += 1;
+        for (i, s) in (0..).zip(text.split('\n')) {
+            self.canvas.string(x, y + i * 10, s, colour)?;
         }
 
         Ok(())
