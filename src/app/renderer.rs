@@ -126,7 +126,7 @@ impl Renderer {
                 wall.pos1.y.round() as i16,
                 wall.pos2.x.round() as i16,
                 wall.pos2.y.round() as i16,
-                1,
+                2,
                 Color::RGB(200, 200, 200),
             )?;
 
