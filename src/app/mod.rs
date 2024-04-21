@@ -74,6 +74,7 @@ fn global_keybinds(
             keycode: Some(Keycode::O),
             ..
         } if keymod.contains(Mod::LCTRLMOD) => {
+            println!("Opening file select dialog");
             let level = FileDialog::new()
                 .set_title("Select Level")
                 .add_filter("Orbit Level", &["obl"])

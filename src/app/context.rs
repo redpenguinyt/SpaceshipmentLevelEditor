@@ -35,6 +35,8 @@ impl Context {
     pub fn build(filepath: &str) -> Result<Self, String> {
         let (player, target, planets, walls) = load_level(filepath)?;
 
+        println!("Loaded {filepath}");
+
         Ok(Self {
             state: AppState::Editing,
             level_path: String::from(filepath),
