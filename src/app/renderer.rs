@@ -1,11 +1,8 @@
-use std::f64::consts::PI;
+use sdl2::{gfx::primitives::DrawRenderer, pixels::Color, render::WindowCanvas, video::Window};
 
-use sdl2::{
-    gfx::primitives::DrawRenderer, image::LoadTexture, pixels::Color, rect::Rect,
-    render::WindowCanvas, video::Window,
-};
+use super::context::{AppState, Context, Vec2F};
 
-use super::context::{AppState, Context, Planet, Player, Simulation, Target, Vec2F, Wall};
+mod draw_objects;
 
 pub const GRID_X_SIZE: u32 = 400;
 pub const GRID_Y_SIZE: u32 = 240;
@@ -54,186 +51,38 @@ impl Renderer {
         Ok(())
     }
 
-    fn draw_background(
-        &mut self,
-        state: AppState,
-        background_path: Option<String>,
-    ) -> Result<(), String> {
-        let colour = if matches!(state, AppState::Editing) {
-            Color::RGB(10, 10, 10)
-        } else {
-            Color::RGB(0, 0, 0)
-        };
-
-        self.canvas.set_draw_color(colour);
-        self.canvas.clear();
-
-        if let Some(bg_path) = background_path {
-            let texture_creator = self.canvas.texture_creator();
-            let load_texture = texture_creator.load_texture(&bg_path);
-
-            match load_texture {
-                Ok(texture) => {
-                    self.canvas
-                        .copy(&texture, Rect::new(0, 0, GRID_X_SIZE, GRID_Y_SIZE), None)?;
-                }
-                Err(e) => {
-                    if !e.contains("Couldn't open ") {
-                        println!("Background image not loaded successfully: {e}");
-                    }
-                }
-            }
-        }
-
-        Ok(())
-    }
-
-    fn draw_planets(&mut self, planets: &[Planet]) -> Result<(), String> {
-        for planet in planets {
-            let pos = ((planet.pos.x.round()) as i16, (planet.pos.y.round()) as i16);
-            let radius = ((planet.mass.abs() / 12.0).round()) as i16;
-
-            if planet.mass.is_sign_positive() {
-                self.canvas
-                    .filled_circle(pos.0, pos.1, radius, Color::GREY)?;
-            } else {
-                self.canvas.circle(pos.0, pos.1, radius, Color::GREY)?;
-            };
-        }
-
-        Ok(())
-    }
-
-    fn draw_player(&mut self, player: &Player) -> Result<(), String> {
-        let angle = player.velocity.y.atan2(player.velocity.x);
-
-        let pos_x = (player.pos.x.round()) as i16;
-        let pos_y = (player.pos.y.round()) as i16;
-
-        self.canvas.filled_trigon(
-            pos_x + (8.0 * angle.cos()).round() as i16,
-            pos_y + (8.0 * angle.sin()).round() as i16,
-            pos_x + (8.0 * PI.mul_add(-0.8, angle).cos()).round() as i16,
-            pos_y + (8.0 * PI.mul_add(-0.8, angle).sin()).round() as i16,
-            pos_x + (8.0 * PI.mul_add(0.8, angle).cos()).round() as i16,
-            pos_y + (8.0 * PI.mul_add(0.8, angle).sin()).round() as i16,
-            Color::WHITE,
-        )
-    }
-
-    fn draw_target(&mut self, target: &Target) -> Result<(), String> {
-        self.canvas.circle(
-            (target.pos.x.round()) as i16,
-            (target.pos.y.round()) as i16,
-            (target.size.round()) as i16,
-            Color::GREEN,
-        )
-    }
-
-    fn draw_walls(
-        &mut self,
-        walls: &[Wall],
-        state: AppState,
-        show_grab_indicators: bool,
-    ) -> Result<(), String> {
-        for wall in walls {
-            self.canvas.thick_line(
-                wall.pos1.x.round() as i16,
-                wall.pos1.y.round() as i16,
-                wall.pos2.x.round() as i16,
-                wall.pos2.y.round() as i16,
-                2,
-                Color::RGB(200, 200, 200),
-            )?;
-
-            if matches!(state, AppState::Editing) && show_grab_indicators {
-                self.canvas.circle(
-                    wall.pos1.x.round() as i16,
-                    wall.pos1.y.round() as i16,
-                    7,
-                    Color::RGB(200, 200, 200),
-                )?;
-                self.canvas.circle(
-                    wall.pos2.x.round() as i16,
-                    wall.pos2.y.round() as i16,
-                    7,
-                    Color::RGB(200, 200, 200),
-                )?;
-            }
-        }
-
-        Ok(())
-    }
-
-    fn draw_trajectory(
-        &mut self,
-        context: &Context,
-        count: i32,
-        spacing: i32,
-        colour: Color,
-    ) -> Result<(), String> {
-        let mut simulation = Simulation::empty();
-        simulation.push(
-            context.player.clone(),
-            context.target.clone(),
-            context.planets.clone(),
-            context.walls.clone(),
-        );
-
-        let mut last_pos = simulation.player.pos;
-
-        let mut has_crashed = false;
-        for _ in 0..count {
-            if has_crashed {
-                break;
-            }
-
-            for _ in 0..spacing {
-                if simulation.tick().is_some() {
-                    has_crashed = true;
-                    break;
-                }
-            }
-
-            self.canvas.set_draw_color(colour);
-            self.canvas.draw_line(last_pos, simulation.player.pos)?;
-
-            last_pos = simulation.player.pos;
-        }
-
-        Ok(())
-    }
-
     pub fn draw(&mut self, context: &Context) -> Result<(), String> {
         let image_background_path = context
             .show_background_image
             .then(|| context.level_path.replace("obl", "png"));
 
-        self.draw_background(context.state, image_background_path)?;
+        draw_objects::background(&mut self.canvas, context.state, image_background_path)?;
 
         if matches!(context.state, AppState::Aiming) {
-            self.draw_trajectory(context, 2000, 1, Color::GREY)?;
-            self.draw_trajectory(context, 15, 4, Color::WHITE)?;
+            draw_objects::trajectory(&mut self.canvas, context, 2000, 1, Color::GREY)?;
+            draw_objects::trajectory(&mut self.canvas, context, 15, 4, Color::WHITE)?;
         }
 
         if matches!(context.state, AppState::Editing) && context.player.velocity != Vec2F::ZERO {
-            self.draw_trajectory(context, 2000, 1, Color::RGB(60, 60, 60))?;
+            draw_objects::trajectory(&mut self.canvas, context, 2000, 1, Color::RGB(60, 60, 60))?;
         }
 
         if matches!(context.state, AppState::Flying | AppState::GameOver(_)) {
-            self.draw_planets(&context.simulation.planets)?;
-            self.draw_player(&context.simulation.player)?;
-            self.draw_target(&context.simulation.target)?;
-            self.draw_walls(
+            draw_objects::planets(&self.canvas, &context.simulation.planets)?;
+            draw_objects::player(&self.canvas, &context.simulation.player)?;
+            draw_objects::target(&self.canvas, &context.simulation.target)?;
+            draw_objects::walls(
+                &self.canvas,
                 &context.simulation.walls,
                 context.state,
                 context.edit_selection.show_grab_indicators,
             )?;
         } else {
-            self.draw_planets(&context.planets)?;
-            self.draw_player(&context.player)?;
-            self.draw_target(&context.target)?;
-            self.draw_walls(
+            draw_objects::planets(&self.canvas, &context.planets)?;
+            draw_objects::player(&self.canvas, &context.player)?;
+            draw_objects::target(&self.canvas, &context.target)?;
+            draw_objects::walls(
+                &self.canvas,
                 &context.walls,
                 context.state,
                 context.edit_selection.show_grab_indicators,
