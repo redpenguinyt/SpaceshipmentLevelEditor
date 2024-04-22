@@ -29,7 +29,7 @@ pub struct Context {
     pub simulation: Simulation,
     pub edit_selection: Selection,
     pub show_hints: bool,
-    pub show_background_image: bool
+    pub show_background_image: bool,
 }
 
 impl Context {
