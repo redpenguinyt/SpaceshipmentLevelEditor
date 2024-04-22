@@ -1,6 +1,8 @@
 /target
 Cargo.lock
 
+screenshot.png
+
 orbits_editor_*.zip
 /orbits_editor_linux
 orbits_editor_win/levels/*

@@ -92,6 +92,13 @@ fn global_keybinds(
             }
         }
 
+        Event::KeyDown {
+            keycode: Some(Keycode::F2),
+            ..
+        } => {
+            renderer.screenshot_next_frame = true;
+        }
+
         _ => (),
     }
 

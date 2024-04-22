@@ -13,6 +13,7 @@ Currently, the editor opens into the last file in the levels folder (sorted alph
 - `Ctrl+Alt+S` to save incrementally (if you were working on a file `mylevel.obl`, saving incrementally will save the file as `mylevel001.obl` and `Ctrl S` will now save to this file. Pressing again will save as `mylevel002.obl`, then `mylevel003.obl` and so on)
 - `Alt+[1-5]` to set the window scale
 - `F1` to show hints!
+- `F2` to take a 400x240 screenshot
 - `B` to toggle the background image, which is found by searching for an image file with the same name as the level (but with a png file extension)
 
 ### Edit Mode
