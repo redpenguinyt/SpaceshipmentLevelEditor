@@ -127,8 +127,23 @@ pub fn load_level(filepath: &str) -> Result<(Player, Target, Vec<Planet>, Vec<Wa
     file.read_to_string(&mut text)
         .map_err(|_| String::from("File is not valid UTF-8"))?;
 
-    let binding = text.replace('\n', " ");
-    let r_nums = binding
+    let mut clean_text = String::new();
+    // Ignore comments
+    let mut chars = text.chars();
+    loop {
+        let Some(c) = chars.next() else {
+            break;
+        };
+
+        if c == '#' {
+            chars.find(|ch| *ch == '\n');
+        } else {
+            clean_text.push(c);
+        }
+    }
+    clean_text = clean_text.replace('\n', " ");
+
+    let r_nums = clean_text
         .split(' ')
         .filter(|s| !s.is_empty())
         .skip(2)
