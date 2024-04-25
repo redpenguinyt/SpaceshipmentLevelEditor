@@ -27,6 +27,8 @@ Currently, the editor opens into the last file in the levels folder (sorted alph
 
 While holding or hovering over a planet or the target, change its size/mass with the scroll wheel. Scaling a planet down far enough will turn it into a negative mass planet, which pushes the player away instead of attracting them.
 
+You can also use the arrow keys to adjust the position of a body using the arrow keys (while having it selected)
+
 ### Aim Mode
 
 - `Esc` to go back to edit mode

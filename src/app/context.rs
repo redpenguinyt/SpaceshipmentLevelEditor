@@ -186,22 +186,39 @@ impl Context {
                 let mouse_pos = Vec2F::new(*x as f64, *y as f64);
                 let mouse_movement = mouse_pos - self.edit_selection.last_mouse_pos;
 
-                match self.edit_selection.body {
-                    SelectedBody::Player => self.player.pos += mouse_movement,
-                    SelectedBody::Planet(i) => self.planets[i].pos += mouse_movement,
-                    SelectedBody::Target => self.target.pos += mouse_movement,
-                    SelectedBody::Wall(i, end) => match end {
-                        WallEnd::Beginning => self.walls[i].pos1 += mouse_movement,
-                        WallEnd::End => self.walls[i].pos2 += mouse_movement,
-                    },
-                    SelectedBody::None => (),
-                };
+                self.move_selected_body(mouse_movement);
 
                 self.edit_selection.last_mouse_pos = mouse_pos;
             }
 
             Event::MouseWheel { y, .. } => {
                 self.change_body_size(*y as f64);
+            }
+
+            // Move selected body with arrow keys
+            Event::KeyDown {
+                keycode: Some(Keycode::Up),
+                ..
+            } => {
+                self.move_selected_body(Vec2F::new(0.0, -1.0));
+            }
+            Event::KeyDown {
+                keycode: Some(Keycode::Down),
+                ..
+            } => {
+                self.move_selected_body(Vec2F::new(0.0, 1.0));
+            }
+            Event::KeyDown {
+                keycode: Some(Keycode::Left),
+                ..
+            } => {
+                self.move_selected_body(Vec2F::new(-1.0, 0.0));
+            }
+            Event::KeyDown {
+                keycode: Some(Keycode::Right),
+                ..
+            } => {
+                self.move_selected_body(Vec2F::new(1.0, 0.0));
             }
 
             Event::MouseButtonUp {
@@ -258,6 +275,19 @@ impl Context {
 
             _ => (),
         }
+    }
+
+    fn move_selected_body(&mut self, movement: Vec2F) {
+        match self.edit_selection.body {
+            SelectedBody::Player => self.player.pos += movement,
+            SelectedBody::Planet(i) => self.planets[i].pos += movement,
+            SelectedBody::Target => self.target.pos += movement,
+            SelectedBody::Wall(i, end) => match end {
+                WallEnd::Beginning => self.walls[i].pos1 += movement,
+                WallEnd::End => self.walls[i].pos2 += movement,
+            },
+            SelectedBody::None => (),
+        };
     }
 
     fn try_select_any_body(&mut self, mouse_pos: Vec2F) {
