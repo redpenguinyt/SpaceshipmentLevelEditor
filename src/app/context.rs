@@ -204,20 +204,6 @@ impl Context {
                 self.change_body_size(*y as f64);
             }
 
-            Event::KeyDown {
-                keycode: Some(Keycode::Up),
-                ..
-            } => {
-                self.change_body_size(0.2);
-            }
-
-            Event::KeyDown {
-                keycode: Some(Keycode::Down),
-                ..
-            } => {
-                self.change_body_size(-0.2);
-            }
-
             Event::MouseButtonUp {
                 mouse_btn: MouseButton::Left,
                 ..
