@@ -282,10 +282,8 @@ impl Context {
             SelectedBody::Player => self.player.pos += movement,
             SelectedBody::Planet(i) => self.planets[i].pos += movement,
             SelectedBody::Target => self.target.pos += movement,
-            SelectedBody::Wall(i, end) => match end {
-                WallEnd::Beginning => self.walls[i].pos1 += movement,
-                WallEnd::End => self.walls[i].pos2 += movement,
-            },
+            SelectedBody::Wall(i, WallEnd::Beginning) => self.walls[i].pos1 += movement,
+            SelectedBody::Wall(i, WallEnd::End) => self.walls[i].pos2 += movement,
             SelectedBody::None => (),
         };
     }
