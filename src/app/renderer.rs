@@ -150,6 +150,14 @@ impl Renderer {
             self.screenshot()?;
         }
 
+        self.draw_hud_text(context)?;
+
+        self.canvas.present();
+
+        Ok(())
+    }
+
+    fn draw_hud_text(&mut self, context: &Context) -> Result<(), String> {
         // Current app state
         self.draw_text(2, 2, &context.state.to_string(), Color::WHITE)?;
 
@@ -157,13 +165,17 @@ impl Renderer {
         let helper_text = match (context.show_hints, context.state) {
             (true, AppState::Editing) => String::from("Drag planets with mouse\nChange size by scrolling while holding\nA to spawn a new planet"),
             (true, AppState::Aiming) => format!("Launch Strength: {:.2}\nAim with mouse\nBring mouse closer to player to lower launch strength", context.player.velocity.magnitude()),
-            (_, AppState::Flying) => format!("Speed x{}", context.simulation.speed),
+            (_, AppState::Flying) => {
+                let paused_text = if context.simulation.playing { "" } else { "Playing" };
+                format!("Speed x{}\n{paused_text}", context.simulation.speed)
+            }
             (true, AppState::GameOver(_)) => String::from("Press R to restart"),
 
             (false, AppState::Aiming) => format!("Launch Strength: {:.2}", context.player.velocity.magnitude()),
 
             (_, _) => String::new(),
         };
+
         self.draw_text(2, 12, &helper_text, Color::YELLOW)?;
 
         // Current level path
@@ -176,8 +188,6 @@ impl Renderer {
             display_path = format!("...{}", &display_path[split_pos.0..].trim());
         }
         self.draw_text(2, 230, &format!("Editing: {display_path}"), Color::WHITE)?;
-
-        self.canvas.present();
 
         Ok(())
     }

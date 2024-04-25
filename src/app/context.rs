@@ -155,6 +155,16 @@ impl Context {
             (
                 AppState::Flying,
                 Event::KeyDown {
+                    keycode: Some(Keycode::Space),
+                    ..
+                },
+            ) => {
+                self.simulation.playing = !self.simulation.playing;
+            }
+
+            (
+                AppState::Flying,
+                Event::KeyDown {
                     keymod,
                     keycode: Some(keycode),
                     ..

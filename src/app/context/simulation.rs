@@ -25,6 +25,7 @@ pub struct Simulation {
     pub planets: Vec<Planet>,
     pub walls: Vec<Wall>,
     pub speed: u32,
+    pub playing: bool,
 }
 
 impl Simulation {
@@ -35,6 +36,7 @@ impl Simulation {
             planets: Vec::new(),
             walls: Vec::new(),
             speed: 1,
+            playing: true,
         }
     }
 
@@ -44,9 +46,14 @@ impl Simulation {
         self.target = target;
         self.planets = planets;
         self.walls = walls;
+        self.playing = true;
     }
 
     pub fn tick(&mut self) -> Option<Event> {
+        if !self.playing {
+            return None;
+        }
+
         for _ in 0..self.speed {
             if self.gravitate_player() || self.is_colliding_with_walls() {
                 return Some(Event::Crashed);

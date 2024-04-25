@@ -43,6 +43,7 @@ This is where the player will actually fly, until they crash
 
 - `Escape` to go back to Edit Mode
 - `R` to go back to Aim Mode
+- `Space` to pause the simulation
 - `[1-4]` to set the simulation speed
 
 ### Game Over
