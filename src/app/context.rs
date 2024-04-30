@@ -113,66 +113,9 @@ impl Context {
 
             (AppState::Editing, _) => self.edit_event(event),
 
-            (
-                AppState::Aiming,
-                Event::KeyDown {
-                    keycode: Some(Keycode::Space),
-                    ..
-                }
-                | Event::MouseButtonDown {
-                    mouse_btn: MouseButton::Left,
-                    ..
-                },
-            ) => {
-                self.state = AppState::Flying;
-                self.simulation.push(
-                    self.player.clone(),
-                    self.target.clone(),
-                    self.planets.clone(),
-                    self.walls.clone(),
-                );
-            }
+            (AppState::Aiming, _) => self.aim_event(event),
 
-            // Aim with the mouse
-            (AppState::Aiming, Event::MouseMotion { x, y, .. }) => {
-                if matches!(self.state, AppState::Aiming) {
-                    let distance_to_mouse =
-                        Vec2F::new(*x as f64 - self.player.pos.x, *y as f64 - self.player.pos.y);
-
-                    let mut normalised = distance_to_mouse / distance_to_mouse.magnitude();
-
-                    if normalised.x.is_nan() || normalised.y.is_nan() {
-                        normalised = Vec2F::new(1.0, 0.0);
-                    }
-
-                    let launch_strength = (distance_to_mouse.magnitude() - 30.0) / 30.0;
-                    let clamped_launch_strength = launch_strength.clamp(1.0, 3.0);
-
-                    self.player.velocity = normalised * clamped_launch_strength;
-                }
-            }
-
-            (
-                AppState::Flying,
-                Event::KeyDown {
-                    keycode: Some(Keycode::Space),
-                    ..
-                },
-            ) => {
-                self.simulation.playing = !self.simulation.playing;
-            }
-
-            (
-                AppState::Flying,
-                Event::KeyDown {
-                    keymod,
-                    keycode: Some(keycode),
-                    ..
-                },
-            ) if !keymod.contains(Mod::LALTMOD) && (49..=52).contains(&(*keycode as i32)) => {
-                // Num1 to Num4
-                self.simulation.speed = *keycode as u32 - 48;
-            }
+            (AppState::Flying, _) => self.fly_event(event),
 
             _ => (),
         }
@@ -282,6 +225,70 @@ impl Context {
 
                 _ => (),
             },
+
+            _ => (),
+        }
+    }
+
+    fn aim_event(&mut self, event: &Event) {
+        match event {
+            Event::KeyDown {
+                keycode: Some(Keycode::Space),
+                ..
+            }
+            | Event::MouseButtonDown {
+                mouse_btn: MouseButton::Left,
+                ..
+            } => {
+                self.state = AppState::Flying;
+                self.simulation.push(
+                    self.player.clone(),
+                    self.target.clone(),
+                    self.planets.clone(),
+                    self.walls.clone(),
+                );
+            }
+
+            // Aim with the mouse
+            Event::MouseMotion { x, y, .. } => {
+                if matches!(self.state, AppState::Aiming) {
+                    let distance_to_mouse =
+                        Vec2F::new(*x as f64 - self.player.pos.x, *y as f64 - self.player.pos.y);
+
+                    let mut normalised = distance_to_mouse / distance_to_mouse.magnitude();
+
+                    if normalised.x.is_nan() || normalised.y.is_nan() {
+                        normalised = Vec2F::new(1.0, 0.0);
+                    }
+
+                    let launch_strength = (distance_to_mouse.magnitude() - 30.0) / 30.0;
+                    let clamped_launch_strength = launch_strength.clamp(1.0, 3.0);
+
+                    self.player.velocity = normalised * clamped_launch_strength;
+                }
+            }
+
+            _ => (),
+        }
+    }
+
+    fn fly_event(&mut self, event: &Event) {
+        match event {
+            Event::KeyDown {
+                keycode: Some(Keycode::Space),
+                ..
+            } => {
+                self.simulation.playing = !self.simulation.playing;
+            }
+
+            Event::KeyDown {
+                keymod,
+                keycode: Some(keycode),
+                ..
+            } if !keymod.contains(Mod::LALTMOD) && (49..=52).contains(&(*keycode as i32)) => {
+                // Num1 to Num4
+                self.simulation.speed = *keycode as u32 - 48;
+            }
 
             _ => (),
         }
