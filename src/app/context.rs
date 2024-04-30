@@ -361,8 +361,6 @@ impl Context {
                 self.change_planet_size(i, change * 0.1);
             }
 
-            SelectedBody::Wall(_, _) | SelectedBody::Player => (),
-
             SelectedBody::None => {
                 // Try target
                 let distance_to_target =
@@ -382,6 +380,8 @@ impl Context {
                     }
                 }
             }
+
+            _ => (),
         };
     }
 
@@ -393,6 +393,7 @@ impl Context {
     fn change_planet_size(&mut self, i: usize, change: f64) {
         if self.planets[i].mass.is_sign_positive() {
             self.planets[i].mass *= 1.0 + change;
+            self.planets[i].mass = self.planets[i].mass.min(12000.0); // planets larger than 12000 look funky
 
             if self.planets[i].mass < 50.0 {
                 self.planets[i].mass = -50.0;
@@ -401,6 +402,7 @@ impl Context {
             }
         } else {
             self.planets[i].mass *= 1.0 - change;
+            self.planets[i].mass = self.planets[i].mass.min(-12000.0);
 
             if self.planets[i].mass > -50.0 {
                 self.planets[i].mass = 50.0;
