@@ -19,4 +19,9 @@ impl Target {
 
         Self::new(nums[0], Vec2F::new(nums[1], nums[2]))
     }
+
+    pub fn change_size(&mut self, change: f64) {
+        self.size *= 1.0 + change;
+        self.size = self.size.max(5.0);
+    }
 }

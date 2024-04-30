@@ -354,11 +354,11 @@ impl Context {
     fn change_body_size(&mut self, change: f64) {
         match self.edit_selection.body {
             SelectedBody::Target => {
-                self.change_target_size(change * 0.1);
+                self.target.change_size(change * 0.1);
             }
 
             SelectedBody::Planet(i) => {
-                self.change_planet_size(i, change * 0.1);
+                self.planets[i].change_size(change * 0.1);
             }
 
             SelectedBody::None => {
@@ -367,7 +367,7 @@ impl Context {
                     (self.target.pos - self.edit_selection.last_mouse_pos).magnitude();
 
                 if distance_to_target < self.target.size + 2.0 {
-                    self.change_target_size(change * 0.1);
+                    self.target.change_size(change * 0.1);
                 }
 
                 // Try planets
@@ -376,40 +376,13 @@ impl Context {
                         (planet.pos - self.edit_selection.last_mouse_pos).magnitude();
 
                     if distance_to_planet < planet.mass.abs() / 12.0 {
-                        self.change_planet_size(i, change * 0.1);
+                        self.planets[i].change_size(change * 0.1);
                     }
                 }
             }
 
             _ => (),
         };
-    }
-
-    fn change_target_size(&mut self, change: f64) {
-        self.target.size *= 1.0 + change;
-        self.target.size = self.target.size.max(5.0);
-    }
-
-    fn change_planet_size(&mut self, i: usize, change: f64) {
-        if self.planets[i].mass.is_sign_positive() {
-            self.planets[i].mass *= 1.0 + change;
-            self.planets[i].mass = self.planets[i].mass.min(12000.0); // planets larger than 12000 look funky
-
-            if self.planets[i].mass < 50.0 {
-                self.planets[i].mass = -50.0;
-            } else {
-                self.planets[i].mass = self.planets[i].mass.max(50.0);
-            }
-        } else {
-            self.planets[i].mass *= 1.0 - change;
-            self.planets[i].mass = self.planets[i].mass.min(-12000.0);
-
-            if self.planets[i].mass > -50.0 {
-                self.planets[i].mass = 50.0;
-            } else {
-                self.planets[i].mass = self.planets[i].mass.min(-50.0);
-            }
-        }
     }
 
     pub fn tick(&mut self) {

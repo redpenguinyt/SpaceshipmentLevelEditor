@@ -19,4 +19,26 @@ impl Planet {
 
         Self::new(nums[0], Vec2F::new(nums[1], nums[2]))
     }
+
+    pub fn change_size(&mut self, change: f64) {
+        if self.mass.is_sign_positive() {
+            self.mass *= 1.0 + change;
+            self.mass = self.mass.min(12000.0); // planets larger than 12000 look funky
+
+            if self.mass < 50.0 {
+                self.mass = -50.0;
+            } else {
+                self.mass = self.mass.max(50.0);
+            }
+        } else {
+            self.mass *= 1.0 - change;
+            self.mass = self.mass.min(-12000.0);
+
+            if self.mass > -50.0 {
+                self.mass = 50.0;
+            } else {
+                self.mass = self.mass.min(-50.0);
+            }
+        }
+    }
 }
