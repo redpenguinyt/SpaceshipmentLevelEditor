@@ -1,8 +1,8 @@
 # Orbit game level editor
 
-This is the source code of the level editor for my game, [Orbit Game (name WIP)](https://redpenguin777.itch.io/orbit-game)
+This is the source code of the level editor for [Spaceshipment](https://redpenguin777.itch.io/spaceshipment)
 
-Currently, the editor opens into the last file in the levels folder (sorted alphabetically). To open a different level you'll need to rename it so that the editor finds it at the end of the folder
+Currently, the editor opens into the last file in the levels folder (sorted alphabetically). To open a different level, use `Ctrl+O`
 
 ## Keyboard Shortcuts
 
