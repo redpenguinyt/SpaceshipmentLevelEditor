@@ -3,8 +3,8 @@ Cargo.lock
 
 screenshot.png
 
-orbits_editor_*.zip
-/orbits_editor_linux
-orbits_editor_win/levels/*
-orbits_editor_win/orbits_editor*
-orbits_editor_win/README.md
+spaceshipment_editor*.zip
+/spaceshipment_editor_linux
+spaceshipment_editor_win/levels/*
+spaceshipment_editor_win/spaceshipment_editor*
+spaceshipment_editor_win/README.md
