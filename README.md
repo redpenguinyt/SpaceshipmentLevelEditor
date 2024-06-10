@@ -1,4 +1,4 @@
-# Orbit game level editor
+# Spaceshipment level editor
 
 This is the source code of the level editor for [Spaceshipment](https://redpenguin777.itch.io/spaceshipment)
 
