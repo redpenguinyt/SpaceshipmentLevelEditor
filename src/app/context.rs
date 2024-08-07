@@ -153,6 +153,7 @@ impl Context {
 
                     if distance_to_planet < planet.mass.abs() / 12.0 {
                         self.planets[i].change_size(change * 0.1);
+                        break;
                     }
                 }
             }

@@ -32,7 +32,7 @@ impl Planet {
             }
         } else {
             self.mass *= 1.0 - change;
-            self.mass = self.mass.min(-12000.0);
+            self.mass = self.mass.max(-12000.0);
 
             if self.mass > -50.0 {
                 self.mass = 50.0;
