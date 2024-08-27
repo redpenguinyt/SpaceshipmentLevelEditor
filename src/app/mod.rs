@@ -3,13 +3,11 @@ use sdl2::event::Event;
 use sdl2::keyboard::{Keycode, Mod};
 
 mod context;
-use context::{get_last_file_in_dir, Context};
 mod renderer;
-use renderer::{Renderer, GRID_X_SIZE, GRID_Y_SIZE};
 mod tick;
+use context::{get_last_file_in_dir, Context, SaveMethod};
+use renderer::{Renderer, GRID_X_SIZE, GRID_Y_SIZE};
 use tick::GameTime;
-
-use crate::app::context::SaveMethod;
 
 const INITIAL_PIXEL_SCALE: u32 = 3;
 
