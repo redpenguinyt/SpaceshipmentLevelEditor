@@ -7,6 +7,7 @@ Currently, the editor opens into the last file in the levels folder (sorted alph
 ## Keyboard Shortcuts
 
 - `Ctrl+Q` to close the app
+- `Ctrl+N` to create a new level
 - `Ctrl+O` to open a level file
 - `Ctrl+S` to save to the current file
 - `Ctrl+Shift+S` to save as

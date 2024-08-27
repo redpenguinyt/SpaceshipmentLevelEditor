@@ -180,7 +180,11 @@ impl Renderer {
         self.draw_text(2, 12, &helper_text, Color::YELLOW)?;
 
         // Current level path
-        let display_path = context.level_path.split('/').last().unwrap_or("new file");
+        let display_path = context
+            .level_path
+            .split('/')
+            .last()
+            .unwrap_or(&context.level_path);
         self.draw_text(2, 230, &format!("Editing {display_path}"), Color::WHITE)?;
 
         Ok(())

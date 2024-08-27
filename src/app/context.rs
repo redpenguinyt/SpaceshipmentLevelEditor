@@ -1,10 +1,12 @@
 mod app_state;
-mod event;
 pub use app_state::AppState;
+
+mod event;
+mod global_keybinds;
 
 mod save_load;
 use save_load::{generate_new_level_path, load_level, save_level};
-pub use save_load::{get_last_file_in_dir, SaveMethod};
+pub use save_load::SaveMethod;
 
 mod selection;
 pub use selection::{SelectedBody, Selection, WallEnd};
@@ -26,23 +28,32 @@ pub struct Context {
 }
 
 impl Context {
-    pub fn build(filepath: &str) -> Result<Self, String> {
-        let (player, target, planets, walls) = load_level(filepath)?;
+    pub fn new() -> Self {
+        println!("Opened new file");
 
-        println!("Loaded {filepath}");
-
-        Ok(Self {
+        Self {
             state: AppState::Editing,
-            level_path: String::from(filepath),
-            player,
-            target,
-            planets,
-            walls,
+            level_path: String::from("new level"),
+            player: Player::new(Vec2F::new(50.0, 120.0)),
+            target: Target::new(20.0, Vec2F::new(330.0, 120.0)),
+            planets: vec![Planet::new(400.0, Vec2F::new(200.0, 120.0))],
+            walls: Vec::new(),
             simulation: Simulation::empty(),
             edit_selection: Selection::new(),
             show_hints: false,
             show_background_image: true,
-        })
+        }
+    }
+
+    pub fn load(&mut self, filepath: &str) -> Result<(), String> {
+        let (player, target, planets, walls) = load_level(filepath)?;
+
+        self.player = player;
+        self.target = target;
+        self.planets = planets;
+        self.walls = walls;
+
+        Ok(())
     }
 
     pub fn save(&mut self, method: SaveMethod) -> Result<(), String> {

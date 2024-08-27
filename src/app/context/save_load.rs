@@ -1,9 +1,8 @@
 use std::{
-    ffi::OsStr,
     fmt::{Error, Write as fmtWrite},
-    fs::{self, File},
+    fs::File,
     io::{BufWriter, Read, Write as ioWrite},
-    path::{Path, PathBuf},
+    path::Path,
 };
 
 use super::{simulation::Wall, Planet, Player, Target, Vec2F};
@@ -100,26 +99,26 @@ fn level_data_to_string(
     Ok(data)
 }
 
-pub fn get_last_file_in_dir(directory: &str) -> Result<String, String> {
-    let mut entries: Vec<PathBuf> = fs::read_dir(directory)
-        .map_err(|e| e.to_string())?
-        .filter_map(Result::ok)
-        .map(|entry| entry.path())
-        .filter(|p| p.extension() == Some(OsStr::new("obl")))
-        .collect();
+// pub fn get_last_file_in_dir(directory: &str) -> Result<String, String> {
+//     let mut entries: Vec<PathBuf> = fs::read_dir(directory)
+//         .map_err(|e| e.to_string())?
+//         .filter_map(Result::ok)
+//         .map(|entry| entry.path())
+//         .filter(|p| p.extension() == Some(OsStr::new("obl")))
+//         .collect();
 
-    entries.sort();
+//     entries.sort();
 
-    let Some(last) = entries.last() else {
-        return Err(String::from("Could not find any files in directory"));
-    };
+//     let Some(last) = entries.last() else {
+//         return Err(String::from("Could not find any files in directory"));
+//     };
 
-    let Some(filepath) = last.to_str() else {
-        return Err(String::from("Filepath is not valid Unicode"));
-    };
+//     let Some(filepath) = last.to_str() else {
+//         return Err(String::from("Filepath is not valid Unicode"));
+//     };
 
-    Ok(String::from(filepath))
-}
+//     Ok(String::from(filepath))
+// }
 
 pub fn load_level(filepath: &str) -> Result<(Player, Target, Vec<Planet>, Vec<Wall>), String> {
     let mut file = File::open(filepath).map_err(|_| String::from("Failed to open file"))?;
