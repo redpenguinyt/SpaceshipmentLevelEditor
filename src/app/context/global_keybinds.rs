@@ -68,7 +68,11 @@ impl super::Context {
                 keycode: Some(Keycode::N),
                 ..
             } if keymod.contains(Mod::LCTRLMOD) => {
+                let show_hints = self.show_hints;
+                let show_background_image = self.show_background_image;
                 *self = Self::new();
+                self.show_hints = show_hints;
+                self.show_background_image = show_background_image;
                 println!("Opened new level");
             }
 
