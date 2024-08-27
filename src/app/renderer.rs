@@ -163,15 +163,16 @@ impl Renderer {
 
         // Helper text
         let helper_text = match (context.show_hints, context.state) {
-            (true, AppState::Editing) => String::from("Drag planets with mouse\nChange size by scrolling while holding\nA to spawn a new planet"),
-            (true, AppState::Aiming) => format!("Launch Strength: {:.2}\nAim with mouse\nBring mouse closer to player to lower launch strength", context.player.velocity.magnitude()),
-            (_, AppState::Flying) => {
-                let paused_text = if context.simulation.playing { "" } else { "Playing" };
-                format!("Speed x{}\n{paused_text}", context.simulation.speed)
-            }
-            (true, AppState::GameOver(_)) => String::from("Press R to restart"),
+            (true, AppState::Editing) => String::from("Drag planets and walls with mouse\nChange size by scrolling while holding\nA to spawn a new planet\nW to spawn a wall\nX to delete a selected body"),
 
             (false, AppState::Aiming) => format!("Launch Strength: {:.2}", context.player.velocity.magnitude()),
+            (true, AppState::Aiming) => format!("Launch Strength: {:.2}\nAim with mouse\n", context.player.velocity.magnitude()),
+
+            (_, AppState::Flying) => {
+                let paused_text = if context.simulation.playing { "" } else { "Paused" };
+                format!("Speed x{}\n{paused_text}", context.simulation.speed)
+            }
+            (true, AppState::GameOver(_)) => String::from("Press Escape to edit\nPress R to restart"),
 
             (_, _) => String::new(),
         };
@@ -179,15 +180,8 @@ impl Renderer {
         self.draw_text(2, 12, &helper_text, Color::YELLOW)?;
 
         // Current level path
-        let mut display_path = context.level_path.clone();
-        if display_path.len() > 47 {
-            let Some(split_pos) = display_path.char_indices().nth_back(40) else {
-                return Err(String::from("Failed to display path"));
-            };
-
-            display_path = format!("...{}", &display_path[split_pos.0..].trim());
-        }
-        self.draw_text(2, 230, &format!("Editing: {display_path}"), Color::WHITE)?;
+        let display_path = context.level_path.split('/').last().unwrap_or("new file");
+        self.draw_text(2, 230, &format!("Editing {display_path}"), Color::WHITE)?;
 
         Ok(())
     }

@@ -26,7 +26,7 @@ impl Display for AppState {
             Self::Aiming => "Aim Mode",
             Self::Flying => "Simulating...",
             Self::GameOver(SimulationEvent::Won) => "Target reached!",
-            Self::GameOver(SimulationEvent::Crashed) => "You crashed!",
+            Self::GameOver(SimulationEvent::Crashed) => "Probe crashed!",
         };
 
         write!(f, "{display_text}")?;

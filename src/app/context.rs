@@ -40,7 +40,7 @@ impl Context {
             walls,
             simulation: Simulation::empty(),
             edit_selection: Selection::new(),
-            show_hints: true,
+            show_hints: false,
             show_background_image: true,
         })
     }
