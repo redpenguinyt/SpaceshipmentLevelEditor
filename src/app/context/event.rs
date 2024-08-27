@@ -86,83 +86,74 @@ impl super::Context {
                 self.change_body_size(*y as f64);
             }
 
-            // Move selected body with arrow keys
-            Event::KeyDown {
-                keycode: Some(Keycode::Up),
-                ..
-            } => {
-                self.move_selected_body(Vec2F::new(0.0, -1.0));
-            }
-            Event::KeyDown {
-                keycode: Some(Keycode::Down),
-                ..
-            } => {
-                self.move_selected_body(Vec2F::new(0.0, 1.0));
-            }
-            Event::KeyDown {
-                keycode: Some(Keycode::Left),
-                ..
-            } => {
-                self.move_selected_body(Vec2F::new(-1.0, 0.0));
-            }
-            Event::KeyDown {
-                keycode: Some(Keycode::Right),
-                ..
-            } => {
-                self.move_selected_body(Vec2F::new(1.0, 0.0));
-            }
-
             Event::MouseButtonUp {
                 mouse_btn: MouseButton::Left,
                 ..
             } => self.edit_selection.deselect(),
 
             Event::KeyDown {
-                keycode: Some(Keycode::A | Keycode::N),
+                keycode: Some(Keycode::D),
+                keymod,
                 ..
-            } => {
-                self.planets
-                    .push(Planet::new(400.0, self.edit_selection.last_mouse_pos));
-
-                self.edit_selection.body = SelectedBody::Planet(self.planets.len() - 1);
+            } if keymod.contains(Mod::LCTRLMOD) => {
+                if let SelectedBody::Planet(i) = self.edit_selection.body {
+                    self.planets.push(self.planets[i].clone());
+                }
             }
 
             Event::KeyDown {
-                keycode: Some(Keycode::W | Keycode::L),
+                keycode: Some(keycode),
                 ..
-            } => {
-                self.walls.push(Wall::new(
-                    self.edit_selection.last_mouse_pos,
-                    self.edit_selection.last_mouse_pos,
-                ));
+            } => match keycode {
+                // Move selected body with arrow keys
+                Keycode::Up => self.move_selected_body(Vec2F::new(0.0, -1.0)),
+                Keycode::Down => self.move_selected_body(Vec2F::new(0.0, 1.0)),
+                Keycode::Left => self.move_selected_body(Vec2F::new(-1.0, 0.0)),
+                Keycode::Right => self.move_selected_body(Vec2F::new(1.0, 0.0)),
 
-                self.edit_selection.body =
-                    SelectedBody::Wall(self.walls.len() - 1, WallEnd::Beginning);
-            }
+                Keycode::A | Keycode::N => {
+                    self.planets
+                        .push(Planet::new(400.0, self.edit_selection.last_mouse_pos));
 
-            Event::KeyDown {
-                keycode: Some(Keycode::H),
-                ..
-            } => self.edit_selection.toggle_grab_indicators(),
-
-            Event::KeyDown {
-                keycode: Some(Keycode::D | Keycode::Backspace | Keycode::X),
-                ..
-            } => match self.edit_selection.body {
-                SelectedBody::Planet(i) => {
-                    self.planets.remove(i);
-
-                    self.edit_selection.body = SelectedBody::None;
+                    self.edit_selection.body = SelectedBody::Planet(self.planets.len() - 1);
                 }
 
-                SelectedBody::Wall(i, _) => {
-                    self.walls.remove(i);
+                Keycode::W | Keycode::L => {
+                    self.walls.push(Wall::new(
+                        self.edit_selection.last_mouse_pos,
+                        self.edit_selection.last_mouse_pos,
+                    ));
 
-                    self.edit_selection.body = SelectedBody::None;
+                    self.edit_selection.body =
+                        SelectedBody::Wall(self.walls.len() - 1, WallEnd::Beginning);
+                }
+
+                Keycode::H => self.edit_selection.toggle_grab_indicators(),
+
+                Keycode::D | Keycode::Backspace | Keycode::X => match self.edit_selection.body {
+                    SelectedBody::Planet(i) => {
+                        self.planets.remove(i);
+
+                        self.edit_selection.body = SelectedBody::None;
+                    }
+
+                    SelectedBody::Wall(i, _) => {
+                        self.walls.remove(i);
+
+                        self.edit_selection.body = SelectedBody::None;
+                    }
+
+                    _ => (),
+                },
+
+                Keycode::I => {
+                    if let SelectedBody::Planet(i) = self.edit_selection.body {
+                        self.planets[i].mass *= -1.0;
+                    }
                 }
 
                 _ => (),
-            },
+            }
 
             _ => (),
         }
