@@ -33,6 +33,11 @@ pub fn main() -> Result<(), String> {
     let mut game_tick = GameTime::new();
     let mut context = Context::new();
 
+    let mut args = std::env::args().skip(1);
+    if let Some(path) = args.next() {
+        context.load(&path)?;
+    }
+
     'running: loop {
         for event in event_pump.poll_iter() {
             if matches!(

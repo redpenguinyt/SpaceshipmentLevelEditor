@@ -29,7 +29,7 @@ pub struct Context {
 
 impl Context {
     pub fn new() -> Self {
-        println!("Opened new file");
+        println!("Created new file");
 
         Self {
             state: AppState::Editing,
@@ -48,10 +48,13 @@ impl Context {
     pub fn load(&mut self, filepath: &str) -> Result<(), String> {
         let (player, target, planets, walls) = load_level(filepath)?;
 
+        self.level_path = String::from(filepath);
         self.player = player;
         self.target = target;
         self.planets = planets;
         self.walls = walls;
+
+        println!("Loaded level {filepath}");
 
         Ok(())
     }
