@@ -2,11 +2,15 @@ use rfd::FileDialog;
 use sdl2::event::Event;
 use sdl2::keyboard::{Keycode, Mod};
 
-use crate::app::Renderer;
 use super::SaveMethod;
+use crate::app::Renderer;
 
 impl super::Context {
-    pub fn global_keybinds(&mut self, event: &Event, renderer: &mut Renderer) -> Result<(), String> {
+    pub fn global_keybinds(
+        &mut self,
+        event: &Event,
+        renderer: &mut Renderer,
+    ) -> Result<(), String> {
         match event {
             Event::KeyDown {
                 keymod,
