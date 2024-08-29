@@ -3,7 +3,7 @@ use std::{
     ops::{Add, AddAssign, Div, Mul, Sub, SubAssign},
 };
 
-use sdl2::rect::Point;
+use sdl2::{keyboard::Keycode, rect::Point};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Vec2F {
@@ -84,5 +84,20 @@ impl Display for Vec2F {
 impl From<Vec2F> for Point {
     fn from(value: Vec2F) -> Self {
         Self::new(value.x.round() as i32, value.y.round() as i32)
+    }
+}
+
+impl TryFrom<&Keycode> for Vec2F {
+    type Error = String;
+
+    fn try_from(value: &Keycode) -> Result<Self, Self::Error> {
+        match value {
+            Keycode::Up => Ok(Self::new(0.0, -1.0)),
+            Keycode::Down => Ok(Self::new(0.0, 1.0)),
+            Keycode::Left => Ok(Self::new(-1.0, 0.0)),
+            Keycode::Right => Ok(Self::new(1.0, 0.0)),
+
+            _ => Err(String::from("Value is not an arrow key")),
+        }
     }
 }

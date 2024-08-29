@@ -110,18 +110,12 @@ impl super::Context {
                 ..
             } => match keycode {
                 // Move selected body with arrow keys
-                Keycode::Up => self
-                    .level_data
-                    .move_selection(self.edit_selection.body, Vec2F::new(0.0, -1.0)),
-                Keycode::Down => self
-                    .level_data
-                    .move_selection(self.edit_selection.body, Vec2F::new(0.0, 1.0)),
-                Keycode::Left => self
-                    .level_data
-                    .move_selection(self.edit_selection.body, Vec2F::new(-1.0, 0.0)),
-                Keycode::Right => self
-                    .level_data
-                    .move_selection(self.edit_selection.body, Vec2F::new(1.0, 0.0)),
+                Keycode::Up | Keycode::Down | Keycode::Left | Keycode::Right => {
+                    self.level_data.move_selection(
+                        self.edit_selection.body,
+                        Vec2F::try_from(keycode).unwrap_or_else(|_| unreachable!()),
+                    );
+                }
 
                 Keycode::A | Keycode::N => {
                     self.level_data
