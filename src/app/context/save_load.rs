@@ -1,11 +1,10 @@
 use std::{
-    fmt::{Error, Write as fmtWrite},
     fs::File,
     io::{BufWriter, Read, Write as ioWrite},
     path::Path,
 };
 
-use super::{simulation::Wall, Planet, Player, Target, Vec2F};
+use super::{LevelData, Planet, Player, Target, Vec2F, Wall};
 
 pub enum SaveMethod {
     ToCurrentFile,
@@ -56,18 +55,10 @@ pub fn generate_new_level_path(old_path: &str) -> Result<String, String> {
     }
 }
 
-pub fn save_level(
-    filepath: &str,
-    player: &Player,
-    target: &Target,
-    planets: &[Planet],
-    walls: &[Wall],
-) -> Result<(), String> {
+pub fn save_level(filepath: &str, level_data: &LevelData) -> Result<(), String> {
     let mut buffer = BufWriter::new(File::create(filepath).map_err(|e| e.to_string())?);
 
-    let level_data = level_data_to_string(player, target, planets, walls)
-        .map_err(|e| format!("Failed to convert level data to obl: {e}"))?;
-    let level_bytes: Vec<u8> = level_data.bytes().collect();
+    let level_bytes: Vec<u8> = level_data.to_string().bytes().collect();
 
     buffer.write_all(&level_bytes).map_err(|e| e.to_string())?;
     buffer.flush().map_err(|e| e.to_string())?;
@@ -75,52 +66,7 @@ pub fn save_level(
     Ok(())
 }
 
-fn level_data_to_string(
-    player: &Player,
-    target: &Target,
-    planets: &[Planet],
-    walls: &[Wall],
-) -> Result<String, Error> {
-    let mut data = String::from("0 0\n");
-
-    writeln!(&mut data, "{} {}", player.pos.x, player.pos.y)?;
-    writeln!(&mut data, "{} {}", target.size.round(), target.pos)?;
-
-    writeln!(&mut data, "{}", planets.len())?;
-    for planet in planets {
-        writeln!(&mut data, "{} {}", planet.mass.round(), planet.pos)?;
-    }
-
-    writeln!(&mut data, "{}", walls.len())?;
-    for wall in walls {
-        writeln!(&mut data, "{} {}", wall.pos1, wall.pos2)?;
-    }
-
-    Ok(data)
-}
-
-// pub fn get_last_file_in_dir(directory: &str) -> Result<String, String> {
-//     let mut entries: Vec<PathBuf> = fs::read_dir(directory)
-//         .map_err(|e| e.to_string())?
-//         .filter_map(Result::ok)
-//         .map(|entry| entry.path())
-//         .filter(|p| p.extension() == Some(OsStr::new("obl")))
-//         .collect();
-
-//     entries.sort();
-
-//     let Some(last) = entries.last() else {
-//         return Err(String::from("Could not find any files in directory"));
-//     };
-
-//     let Some(filepath) = last.to_str() else {
-//         return Err(String::from("Filepath is not valid Unicode"));
-//     };
-
-//     Ok(String::from(filepath))
-// }
-
-pub fn load_level(filepath: &str) -> Result<(Player, Target, Vec<Planet>, Vec<Wall>), String> {
+pub fn load_level(filepath: &str) -> Result<LevelData, String> {
     let mut file = File::open(filepath).map_err(|_| String::from("Failed to open file"))?;
     let mut text = String::new();
     file.read_to_string(&mut text)
@@ -145,7 +91,6 @@ pub fn load_level(filepath: &str) -> Result<(Player, Target, Vec<Planet>, Vec<Wa
     let r_nums = clean_text
         .split(' ')
         .filter(|s| !s.is_empty())
-        .skip(2)
         .map(str::parse::<f64>);
 
     let mut nums = Vec::new();
@@ -154,6 +99,8 @@ pub fn load_level(filepath: &str) -> Result<(Player, Target, Vec<Planet>, Vec<Wa
     }
 
     nums.reverse();
+
+    let level_position = (pop_or_eof(&mut nums)? as i32, pop_or_eof(&mut nums)? as i32);
 
     let player = Player::new(Vec2F::new(pop_or_eof(&mut nums)?, pop_or_eof(&mut nums)?));
 
@@ -182,7 +129,13 @@ pub fn load_level(filepath: &str) -> Result<(Player, Target, Vec<Planet>, Vec<Wa
         ]));
     }
 
-    Ok((player, target, planets, walls))
+    Ok(LevelData {
+        level_position,
+        player,
+        target,
+        planets,
+        walls,
+    })
 }
 
 fn pop_or_eof(nums: &mut Vec<f64>) -> Result<f64, String> {

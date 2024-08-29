@@ -1,4 +1,4 @@
-use super::Vec2F;
+use super::{LevelData, Vec2F};
 
 #[derive(Debug, Clone, Copy)]
 pub enum WallEnd {
@@ -15,7 +15,7 @@ pub enum SelectedBody {
     None,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct Selection {
     pub body: SelectedBody,
     pub last_mouse_pos: Vec2F,
@@ -35,8 +35,58 @@ impl Selection {
         self.show_grab_indicators = !self.show_grab_indicators;
     }
 
+    pub fn try_select(&mut self, level_data: &LevelData, mouse_pos: Vec2F) {
+        // Try Player
+        if self.try_select_body(mouse_pos, SelectedBody::Player, level_data.player.pos, 14.0) {
+            return;
+        }
+
+        // Try Target
+        if self.try_select_body(
+            mouse_pos,
+            SelectedBody::Target,
+            level_data.target.pos,
+            level_data.target.size + 2.0,
+        ) {
+            return;
+        }
+
+        // Try walls
+        for (i, wall) in level_data.walls.iter().enumerate() {
+            if self.try_select_body(
+                mouse_pos,
+                SelectedBody::Wall(i, WallEnd::Beginning),
+                wall.pos1,
+                8.0,
+            ) {
+                return;
+            }
+
+            if self.try_select_body(
+                mouse_pos,
+                SelectedBody::Wall(i, WallEnd::End),
+                wall.pos2,
+                8.0,
+            ) {
+                return;
+            }
+        }
+
+        // Try planets
+        for (i, planet) in level_data.planets.iter().enumerate() {
+            if self.try_select_body(
+                mouse_pos,
+                SelectedBody::Planet(i),
+                planet.pos,
+                planet.mass.abs() / 12.0,
+            ) {
+                return;
+            }
+        }
+    }
+
     /// Attempt to select a body. Returns true if the body is actually selected
-    pub fn try_select(
+    fn try_select_body(
         &mut self,
         mouse_pos: Vec2F,
         body: SelectedBody,

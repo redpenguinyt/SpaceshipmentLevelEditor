@@ -70,20 +70,22 @@ impl super::Context {
             } => {
                 let mouse_pos = Vec2F::new(*x as f64, *y as f64);
 
-                self.try_select_any_body(mouse_pos);
+                self.edit_selection.try_select(&self.level_data, mouse_pos);
             }
 
             Event::MouseMotion { x, y, .. } => {
                 let mouse_pos = Vec2F::new(*x as f64, *y as f64);
                 let mouse_movement = mouse_pos - self.edit_selection.last_mouse_pos;
 
-                self.move_selected_body(mouse_movement);
+                self.level_data
+                    .move_selection(self.edit_selection.body, mouse_movement);
 
                 self.edit_selection.last_mouse_pos = mouse_pos;
             }
 
             Event::MouseWheel { y, .. } => {
-                self.change_body_size(*y as f64);
+                self.level_data
+                    .resize_selection(self.edit_selection, *y as f64);
             }
 
             Event::MouseButtonUp {
@@ -97,7 +99,9 @@ impl super::Context {
                 ..
             } if keymod.contains(Mod::LCTRLMOD) => {
                 if let SelectedBody::Planet(i) = self.edit_selection.body {
-                    self.planets.push(self.planets[i].clone());
+                    self.level_data
+                        .planets
+                        .push(self.level_data.planets[i].clone());
                 }
             }
 
@@ -106,39 +110,49 @@ impl super::Context {
                 ..
             } => match keycode {
                 // Move selected body with arrow keys
-                Keycode::Up => self.move_selected_body(Vec2F::new(0.0, -1.0)),
-                Keycode::Down => self.move_selected_body(Vec2F::new(0.0, 1.0)),
-                Keycode::Left => self.move_selected_body(Vec2F::new(-1.0, 0.0)),
-                Keycode::Right => self.move_selected_body(Vec2F::new(1.0, 0.0)),
+                Keycode::Up => self
+                    .level_data
+                    .move_selection(self.edit_selection.body, Vec2F::new(0.0, -1.0)),
+                Keycode::Down => self
+                    .level_data
+                    .move_selection(self.edit_selection.body, Vec2F::new(0.0, 1.0)),
+                Keycode::Left => self
+                    .level_data
+                    .move_selection(self.edit_selection.body, Vec2F::new(-1.0, 0.0)),
+                Keycode::Right => self
+                    .level_data
+                    .move_selection(self.edit_selection.body, Vec2F::new(1.0, 0.0)),
 
                 Keycode::A | Keycode::N => {
-                    self.planets
+                    self.level_data
+                        .planets
                         .push(Planet::new(400.0, self.edit_selection.last_mouse_pos));
 
-                    self.edit_selection.body = SelectedBody::Planet(self.planets.len() - 1);
+                    self.edit_selection.body =
+                        SelectedBody::Planet(self.level_data.planets.len() - 1);
                 }
 
                 Keycode::W | Keycode::L => {
-                    self.walls.push(Wall::new(
+                    self.level_data.walls.push(Wall::new(
                         self.edit_selection.last_mouse_pos,
                         self.edit_selection.last_mouse_pos,
                     ));
 
                     self.edit_selection.body =
-                        SelectedBody::Wall(self.walls.len() - 1, WallEnd::Beginning);
+                        SelectedBody::Wall(self.level_data.walls.len() - 1, WallEnd::Beginning);
                 }
 
                 Keycode::H => self.edit_selection.toggle_grab_indicators(),
 
                 Keycode::D | Keycode::Backspace | Keycode::X => match self.edit_selection.body {
                     SelectedBody::Planet(i) => {
-                        self.planets.remove(i);
+                        self.level_data.planets.remove(i);
 
                         self.edit_selection.body = SelectedBody::None;
                     }
 
                     SelectedBody::Wall(i, _) => {
-                        self.walls.remove(i);
+                        self.level_data.walls.remove(i);
 
                         self.edit_selection.body = SelectedBody::None;
                     }
@@ -148,12 +162,12 @@ impl super::Context {
 
                 Keycode::I => {
                     if let SelectedBody::Planet(i) = self.edit_selection.body {
-                        self.planets[i].mass *= -1.0;
+                        self.level_data.planets[i].mass *= -1.0;
                     }
                 }
 
                 _ => (),
-            }
+            },
 
             _ => (),
         }
@@ -170,19 +184,16 @@ impl super::Context {
                 ..
             } => {
                 self.state = AppState::Flying;
-                self.simulation.push(
-                    self.player.clone(),
-                    self.target.clone(),
-                    self.planets.clone(),
-                    self.walls.clone(),
-                );
+                self.simulation.push(&self.level_data);
             }
 
             // Aim with the mouse
             Event::MouseMotion { x, y, .. } => {
                 if matches!(self.state, AppState::Aiming) {
-                    let distance_to_mouse =
-                        Vec2F::new(*x as f64 - self.player.pos.x, *y as f64 - self.player.pos.y);
+                    let distance_to_mouse = Vec2F::new(
+                        *x as f64 - self.level_data.player.pos.x,
+                        *y as f64 - self.level_data.player.pos.y,
+                    );
 
                     let mut normalised = distance_to_mouse / distance_to_mouse.magnitude();
 
@@ -193,7 +204,7 @@ impl super::Context {
                     let launch_strength = (distance_to_mouse.magnitude() - 30.0) / 30.0;
                     let clamped_launch_strength = launch_strength.clamp(1.0, 3.0);
 
-                    self.player.velocity = normalised * clamped_launch_strength;
+                    self.level_data.player.velocity = normalised * clamped_launch_strength;
                 }
             }
 

@@ -3,6 +3,7 @@ use sdl2::event::Event;
 use sdl2::keyboard::{Keycode, Mod};
 
 use super::SaveMethod;
+use crate::app::context::LevelData;
 use crate::app::Renderer;
 
 impl super::Context {
@@ -10,7 +11,7 @@ impl super::Context {
         &mut self,
         event: &Event,
         renderer: &mut Renderer,
-    ) -> Result<(), String> {
+    ) -> Result<bool, String> {
         match event {
             Event::KeyDown {
                 keymod,
@@ -72,11 +73,8 @@ impl super::Context {
                 keycode: Some(Keycode::N),
                 ..
             } if keymod.contains(Mod::LCTRLMOD) => {
-                let show_hints = self.show_hints;
-                let show_background_image = self.show_background_image;
-                *self = Self::new();
-                self.show_hints = show_hints;
-                self.show_background_image = show_background_image;
+                self.level_path = String::from("new level");
+                self.level_data = LevelData::default();
                 println!("Opened new level");
             }
 
@@ -110,9 +108,9 @@ impl super::Context {
                 renderer.screenshot_next_frame = true;
             }
 
-            _ => (),
+            _ => return Ok(false),
         }
 
-        Ok(())
+        Ok(true)
     }
 }

@@ -52,9 +52,11 @@ pub fn main() -> Result<(), String> {
                 break 'running;
             }
 
-            context.global_keybinds(&event, &mut renderer)?;
+            let global_keybind_pressed = context.global_keybinds(&event, &mut renderer)?;
 
-            context.event(&event);
+            if !global_keybind_pressed {
+                context.event(&event);
+            }
         }
 
         context.tick();

@@ -1,3 +1,5 @@
+use super::LevelData;
+
 mod planet;
 mod player;
 mod target;
@@ -19,6 +21,7 @@ pub enum Event {
     Won,
 }
 
+#[derive(Debug, Clone)]
 pub struct Simulation {
     pub player: Player,
     pub target: Target,
@@ -41,11 +44,11 @@ impl Simulation {
     }
 
     /// Replace the contents of the simulation with the newly passed items
-    pub fn push(&mut self, player: Player, target: Target, planets: Vec<Planet>, walls: Vec<Wall>) {
-        self.player = player;
-        self.target = target;
-        self.planets = planets;
-        self.walls = walls;
+    pub fn push(&mut self, level_data: &LevelData) {
+        self.player = level_data.player.clone();
+        self.target = level_data.target.clone();
+        self.planets.clone_from(&level_data.planets);
+        self.walls.clone_from(&level_data.walls);
         self.playing = true;
     }
 

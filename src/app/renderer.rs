@@ -3,7 +3,7 @@ use sdl2::{
     render::WindowCanvas, surface::Surface, video::Window,
 };
 
-use super::context::{AppState, Context, Vec2F};
+use super::context::{AppState, Context, Simulation, Vec2F};
 
 mod draw_objects;
 
@@ -119,31 +119,30 @@ impl Renderer {
             draw_objects::trajectory(&mut self.canvas, context, 15, 4, Color::WHITE)?;
         }
 
-        if matches!(context.state, AppState::Editing) && context.player.velocity != Vec2F::ZERO {
+        if matches!(context.state, AppState::Editing)
+            && context.level_data.player.velocity != Vec2F::ZERO
+        {
             draw_objects::trajectory(&mut self.canvas, context, 2000, 1, Color::RGB(60, 60, 60))?;
         }
 
-        if matches!(context.state, AppState::Flying | AppState::GameOver(_)) {
-            draw_objects::planets(&self.canvas, &context.simulation.planets)?;
-            draw_objects::player(&self.canvas, &context.simulation.player)?;
-            draw_objects::target(&self.canvas, &context.simulation.target)?;
-            draw_objects::walls(
-                &self.canvas,
-                &context.simulation.walls,
-                context.state,
-                context.edit_selection.show_grab_indicators,
-            )?;
+        let drawn_level = if matches!(context.state, AppState::Flying | AppState::GameOver(_)) {
+            context.simulation.clone()
         } else {
-            draw_objects::planets(&self.canvas, &context.planets)?;
-            draw_objects::player(&self.canvas, &context.player)?;
-            draw_objects::target(&self.canvas, &context.target)?;
-            draw_objects::walls(
-                &self.canvas,
-                &context.walls,
-                context.state,
-                context.edit_selection.show_grab_indicators,
-            )?;
-        }
+            let mut simulation = Simulation::empty();
+            simulation.push(&context.level_data);
+
+            simulation
+        };
+
+        draw_objects::planets(&self.canvas, &drawn_level.planets)?;
+        draw_objects::player(&self.canvas, &drawn_level.player)?;
+        draw_objects::target(&self.canvas, &drawn_level.target)?;
+        draw_objects::walls(
+            &self.canvas,
+            &drawn_level.walls,
+            context.state,
+            context.edit_selection.show_grab_indicators,
+        )?;
 
         if self.screenshot_next_frame {
             self.screenshot_next_frame = false;
@@ -165,8 +164,8 @@ impl Renderer {
         let helper_text = match (context.show_hints, context.state) {
             (true, AppState::Editing) => String::from("Drag planets and walls with mouse\nChange size by scrolling while holding\nA to spawn a new planet\nW to spawn a wall\nX to delete a selected body"),
 
-            (false, AppState::Aiming) => format!("Launch Strength: {:.2}", context.player.velocity.magnitude()),
-            (true, AppState::Aiming) => format!("Launch Strength: {:.2}\nAim with mouse\n", context.player.velocity.magnitude()),
+            (false, AppState::Aiming) => format!("Launch Strength: {:.2}", context.level_data.player.velocity.magnitude()),
+            (true, AppState::Aiming) => format!("Launch Strength: {:.2}\nAim with mouse\n", context.level_data.player.velocity.magnitude()),
 
             (_, AppState::Flying) => {
                 let paused_text = if context.simulation.playing { "" } else { "Paused" };

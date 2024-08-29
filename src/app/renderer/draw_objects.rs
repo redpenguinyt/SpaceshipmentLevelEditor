@@ -124,12 +124,7 @@ pub fn trajectory(
     colour: Color,
 ) -> Result<(), String> {
     let mut simulation = Simulation::empty();
-    simulation.push(
-        context.player.clone(),
-        context.target.clone(),
-        context.planets.clone(),
-        context.walls.clone(),
-    );
+    simulation.push(&context.level_data);
 
     let mut last_pos = simulation.player.pos;
 
