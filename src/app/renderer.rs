@@ -184,8 +184,6 @@ impl Renderer {
             .split('/')
             .last()
             .unwrap_or(&context.level_path);
-        self.draw_text(2, 230, &format!("Editing {display_path}"), Color::WHITE)?;
-
-        Ok(())
+        self.draw_text(2, 230, &format!("Editing {display_path}"), Color::WHITE)
     }
 }

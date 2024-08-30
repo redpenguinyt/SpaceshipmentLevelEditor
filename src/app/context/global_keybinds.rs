@@ -2,9 +2,10 @@ use rfd::FileDialog;
 use sdl2::event::Event;
 use sdl2::keyboard::{Keycode, Mod};
 
-use super::SaveMethod;
-use crate::app::context::LevelData;
 use crate::app::Renderer;
+use super::LevelData;
+
+mod incremental_path;
 
 impl super::Context {
     pub fn global_keybinds(
@@ -45,7 +46,7 @@ impl super::Context {
                         return Err(String::from("Path is not valid unicode"));
                     };
 
-                    self.save(SaveMethod::As(String::from(path)))?;
+                    self.save(Some(String::from(path)))?;
                     println!("Saved as {}", self.level_path);
                 }
             }
@@ -55,7 +56,7 @@ impl super::Context {
                 keycode: Some(Keycode::S),
                 ..
             } if keymod.contains(Mod::LCTRLMOD | Mod::LALTMOD) => {
-                self.save(SaveMethod::Incremental)?;
+                self.save(Some(incremental_path::generate(&self.level_path)?))?;
                 println!("Saved incrementally to {}", self.level_path);
             }
 
@@ -64,7 +65,7 @@ impl super::Context {
                 keycode: Some(Keycode::S),
                 ..
             } if keymod.contains(Mod::LCTRLMOD) => {
-                self.save(SaveMethod::ToCurrentFile)?;
+                self.save(None)?;
                 println!("Saved to {}", self.level_path);
             }
 

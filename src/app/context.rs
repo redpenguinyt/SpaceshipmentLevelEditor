@@ -7,9 +7,6 @@ mod global_keybinds;
 mod level_data;
 pub use level_data::LevelData;
 
-mod save_load;
-use save_load::{generate_new_level_path, load_level, save_level, SaveMethod};
-
 mod selection;
 pub use selection::{SelectedBody, Selection, WallEnd};
 
@@ -43,23 +40,20 @@ impl Context {
 
     pub fn load(&mut self, filepath: &str) -> Result<(), String> {
         self.level_path = String::from(filepath);
-        self.level_data = load_level(filepath)?;
+        self.level_data = LevelData::load(filepath)?;
 
         println!("Loaded level {filepath}");
 
         Ok(())
     }
 
-    pub fn save(&mut self, method: SaveMethod) -> Result<(), String> {
-        match method {
-            SaveMethod::ToCurrentFile => (),
-            SaveMethod::Incremental => self.level_path = generate_new_level_path(&self.level_path)?,
-            SaveMethod::As(path) => self.level_path = path,
-        };
+    /// Saves the level to the new filepath, or the old one if `new_path` is None
+    pub fn save(&mut self, new_path: Option<String>) -> Result<(), String> {
+        if let Some(path) = new_path {
+            self.level_path = path;
+        }
 
-        save_level(&self.level_path, &self.level_data)?;
-
-        Ok(())
+        self.level_data.save(&self.level_path)
     }
 
     pub fn tick(&mut self) {

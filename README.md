@@ -25,10 +25,10 @@ Currently, the editor opens into the last file in the levels folder (sorted alph
 - `X`, `D` or `Backspace` to delete a planet while holding it
 - `Space` to enter Aim Mode
 - `H` to toggle grab indicators (e.g. the circles around the ends of walls)
-- `I` to invert a planet's mass, toggling it between regular and antiplanet
+- `I` to invert a planet's mass, toggling it between a regular and anti- planet
 - `Ctrl+D` to duplicate the currently selected planet
 
-While holding or hovering over a planet or the target, change its size/mass with the scroll wheel. Scaling a planet down far enough will turn it into a negative mass planet, which pushes the player away instead of attracting them.
+While holding or hovering over a planet or the target, change its size/mass with the scroll wheel. Scaling a planet down far enough will turn it into an antiplanet, which pushes the player away instead of attracting them.
 
 You can also use the arrow keys to adjust the position of a body using the arrow keys (while having it selected)
 

@@ -29,8 +29,6 @@ impl Display for AppState {
             Self::GameOver(SimulationEvent::Crashed) => "Probe crashed!",
         };
 
-        write!(f, "{display_text}")?;
-
-        Ok(())
+        write!(f, "{display_text}")
     }
 }
