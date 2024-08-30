@@ -68,24 +68,24 @@ impl super::Context {
                 y,
                 ..
             } => {
-                let mouse_pos = Vec2F::new(*x as f64, *y as f64);
+                let mouse_pos = Vec2F::from_mouse_pos(*x, *y);
 
                 self.edit_selection.try_select(&self.level_data, mouse_pos);
             }
 
             Event::MouseMotion { x, y, .. } => {
-                let mouse_pos = Vec2F::new(*x as f64, *y as f64);
-                let mouse_movement = mouse_pos - self.edit_selection.last_mouse_pos;
+                let mouse_pos = Vec2F::from_mouse_pos(*x, *y);
 
-                self.level_data
-                    .move_selection(self.edit_selection.body, mouse_movement);
+                self.level_data.move_selection(
+                    self.edit_selection.body,
+                    mouse_pos - self.edit_selection.last_mouse_pos,
+                );
 
                 self.edit_selection.last_mouse_pos = mouse_pos;
             }
 
             Event::MouseWheel { y, .. } => {
-                self.level_data
-                    .resize_selection(self.edit_selection, *y as f64);
+                self.level_data.resize_selection(self.edit_selection, *y);
             }
 
             Event::MouseButtonUp {
@@ -184,10 +184,8 @@ impl super::Context {
             // Aim with the mouse
             Event::MouseMotion { x, y, .. } => {
                 if matches!(self.state, AppState::Aiming) {
-                    let distance_to_mouse = Vec2F::new(
-                        *x as f64 - self.level_data.player.pos.x,
-                        *y as f64 - self.level_data.player.pos.y,
-                    );
+                    let distance_to_mouse =
+                        Vec2F::from_mouse_pos(*x, *y) - self.level_data.player.pos;
 
                     let mut normalised = distance_to_mouse / distance_to_mouse.magnitude();
 

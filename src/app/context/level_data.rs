@@ -112,10 +112,12 @@ impl LevelData {
         };
     }
 
-    pub fn resize_selection(&mut self, edit_selection: Selection, change: f64) {
+    pub fn resize_selection(&mut self, edit_selection: Selection, change: i32) {
+        let change = change as f64 *0.1;
+
         match edit_selection.body {
-            SelectedBody::Target => self.target.change_size(change * 0.1),
-            SelectedBody::Planet(i) => self.planets[i].change_size(change * 0.1),
+            SelectedBody::Target => self.target.change_size(change),
+            SelectedBody::Planet(i) => self.planets[i].change_size(change),
 
             SelectedBody::None => {
                 // Try target
@@ -123,7 +125,7 @@ impl LevelData {
                     (self.target.pos - edit_selection.last_mouse_pos).magnitude();
 
                 if distance_to_target < self.target.size + 2.0 {
-                    self.target.change_size(change * 0.1);
+                    self.target.change_size(change);
                 }
 
                 // Try planets
@@ -132,7 +134,7 @@ impl LevelData {
                         (planet.pos - edit_selection.last_mouse_pos).magnitude();
 
                     if distance_to_planet < planet.mass.abs() / 12.0 {
-                        self.planets[i].change_size(change * 0.1);
+                        self.planets[i].change_size(change);
                         break;
                     }
                 }

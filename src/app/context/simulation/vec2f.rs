@@ -18,6 +18,13 @@ impl Vec2F {
         Self { x, y }
     }
 
+    pub const fn from_mouse_pos(x: i32, y: i32) -> Self {
+        Self {
+            x: x as f64,
+            y: y as f64,
+        }
+    }
+
     pub fn magnitude(&self) -> f64 {
         self.x.hypot(self.y)
     }
