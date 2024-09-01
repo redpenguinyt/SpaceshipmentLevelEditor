@@ -41,6 +41,7 @@ impl Context {
     pub fn load(&mut self, filepath: &str) -> Result<(), String> {
         self.level_path = String::from(filepath);
         self.level_data = LevelData::load(filepath)?;
+        self.state = AppState::Editing;
 
         println!("Loaded level {filepath}");
 
