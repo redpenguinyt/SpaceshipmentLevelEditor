@@ -25,6 +25,11 @@ impl Vec2F {
         }
     }
 
+    /// Equivalent to `self.y.atan2(self.x)`
+    pub fn angle(self) -> f64 {
+        self.y.atan2(self.x)
+    }
+
     pub fn magnitude(&self) -> f64 {
         self.x.hypot(self.y)
     }

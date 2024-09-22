@@ -56,7 +56,7 @@ pub fn planets(canvas: &WindowCanvas, planets: &[Planet]) -> Result<(), String> 
 }
 
 pub fn player(canvas: &WindowCanvas, player: &Player) -> Result<(), String> {
-    let angle = player.velocity.y.atan2(player.velocity.x);
+    let angle = player.velocity.angle();
 
     let pos_x = (player.pos.x.round()) as i16;
     let pos_y = (player.pos.y.round()) as i16;

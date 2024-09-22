@@ -70,19 +70,16 @@ impl Simulation {
         None
     }
 
-    /// Returns true if the player crashes
+    /// Returns `true` if the player crashes
     fn gravitate_player(&mut self) -> bool {
         for planet in &self.planets {
             let distance = planet.pos - self.player.pos;
+            let angle = distance.angle();
+
             let magnitude = distance.x.mul_add(distance.x, distance.y.powi(2));
+            let acceleration = G * planet.mass / magnitude;
 
-            let force = G * planet.mass / magnitude;
-
-            let velocity = force;
-
-            let angle = (distance.y).atan2(distance.x);
-
-            self.player.velocity += Vec2F::new(velocity * angle.cos(), velocity * angle.sin());
+            self.player.velocity += Vec2F::new(angle.cos(), angle.sin()) * acceleration;
 
             if magnitude < planet.mass.powi(2) / 144.0 {
                 return true;
