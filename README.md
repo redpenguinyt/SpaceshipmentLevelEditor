@@ -37,6 +37,7 @@ You can also use the arrow keys to adjust the position of a body using the arrow
 - `Esc` to go back to edit mode
 - `Space` or `RMB` to launch
 - Aim the player with the mouse. Bringing the mouse closer to the player will have a lower launch strength
+- You can also aim with the arrow keys, just like in the game! Moving the mouse will overwrite where you aimed with the arrow keys so be careful not to move it until you launch
 
 The trajectory line shows where the player will fly if you launch. The white part of the line represents how far the player will be able to see in the actual game
 

@@ -1,3 +1,4 @@
+use core::f64::consts;
 use std::{
     fmt::Display,
     ops::{Add, AddAssign, Div, Mul, Sub, SubAssign},
@@ -32,6 +33,16 @@ impl Vec2F {
 
     pub fn magnitude(&self) -> f64 {
         self.x.hypot(self.y)
+    }
+
+    pub fn normalised(&self) -> Self {
+        let mut normalised = *self / self.magnitude();
+
+        if normalised.x.is_nan() || normalised.y.is_nan() {
+            normalised = Self::new(consts::FRAC_1_SQRT_2, consts::FRAC_1_SQRT_2);
+        }
+
+        normalised
     }
 }
 

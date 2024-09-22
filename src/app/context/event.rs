@@ -183,22 +183,20 @@ impl super::Context {
 
             // Aim with the mouse
             Event::MouseMotion { x, y, .. } => {
-                if matches!(self.state, AppState::Aiming) {
-                    let distance_to_mouse =
-                        Vec2F::from_mouse_pos(*x, *y) - self.level_data.player.pos;
-
-                    let mut normalised = distance_to_mouse / distance_to_mouse.magnitude();
-
-                    if normalised.x.is_nan() || normalised.y.is_nan() {
-                        normalised = Vec2F::new(1.0, 0.0);
-                    }
-
-                    let launch_strength = (distance_to_mouse.magnitude() - 30.0) / 30.0;
-                    let clamped_launch_strength = launch_strength.clamp(1.0, 3.0);
-
-                    self.level_data.player.velocity = normalised * clamped_launch_strength;
-                }
+                self.level_data.player.aim_at(Vec2F::from_mouse_pos(*x, *y));
             }
+
+            // Aim with the arrow keys
+            Event::KeyDown {
+                keycode: Some(code),
+                ..
+            } => match code {
+                Keycode::Up => self.level_data.player.change_power(0.02),
+                Keycode::Down => self.level_data.player.change_power(-0.02),
+                Keycode::Left => self.level_data.player.change_angle(-1.0),
+                Keycode::Right => self.level_data.player.change_angle(1.0),
+                _ => (),
+            },
 
             _ => (),
         }
