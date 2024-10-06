@@ -48,7 +48,7 @@ impl Renderer {
             .map_err(|e| e.to_string())
     }
 
-    fn draw_text(&mut self, x: i16, y: i16, text: &str, colour: Color) -> Result<(), String> {
+    fn draw_text(&self, x: i16, y: i16, text: &str, colour: Color) -> Result<(), String> {
         for (i, s) in (0..).zip(text.split('\n')) {
             self.canvas.string(x, y + i * 10, s, colour)?;
         }
@@ -56,7 +56,7 @@ impl Renderer {
         Ok(())
     }
 
-    pub fn screenshot(&mut self) -> Result<(), String> {
+    pub fn screenshot(&self) -> Result<(), String> {
         let pixels = self
             .canvas
             .read_pixels(None, self.canvas.default_pixel_format())?;
@@ -156,7 +156,7 @@ impl Renderer {
         Ok(())
     }
 
-    fn draw_hud_text(&mut self, context: &Context) -> Result<(), String> {
+    fn draw_hud_text(&self, context: &Context) -> Result<(), String> {
         // Current app state
         self.draw_text(2, 2, &context.state.to_string(), Color::WHITE)?;
 
