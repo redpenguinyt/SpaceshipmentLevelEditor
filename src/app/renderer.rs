@@ -1,11 +1,9 @@
-use sdl2::{
-    gfx::primitives::DrawRenderer, image::SaveSurface, pixels::Color, rect::Rect,
-    render::WindowCanvas, surface::Surface, video::Window,
-};
+use sdl2::{gfx::primitives::DrawRenderer, pixels::Color, render::WindowCanvas, video::Window};
 
 use super::context::{AppState, Context, Simulation, Vec2F};
 
 mod draw_objects;
+mod screenshot;
 
 pub const GRID_X_SIZE: u32 = 400;
 pub const GRID_Y_SIZE: u32 = 240;
@@ -56,57 +54,6 @@ impl Renderer {
         Ok(())
     }
 
-    pub fn screenshot(&self) -> Result<(), String> {
-        let pixels = self
-            .canvas
-            .read_pixels(None, self.canvas.default_pixel_format())?;
-
-        let scaled_pixels: Vec<u8> = pixels
-            .chunks(4)
-            .enumerate()
-            .filter_map(|(i, p)| {
-                if i % self.pixel_scale as usize > 0 {
-                    return None;
-                }
-
-                if i / (GRID_X_SIZE * self.pixel_scale) as usize % self.pixel_scale as usize > 0 {
-                    return None;
-                }
-
-                Some(p.to_vec())
-            })
-            .flatten()
-            .collect();
-
-        let mut screenshot_surface =
-            Surface::new(GRID_X_SIZE, GRID_Y_SIZE, self.canvas.default_pixel_format())?
-                .into_canvas()?;
-
-        let surface_texture_creator = screenshot_surface.texture_creator();
-        let mut screenshot_texture = surface_texture_creator
-            .create_texture_target(self.canvas.default_pixel_format(), GRID_X_SIZE, GRID_Y_SIZE)
-            .map_err(|e| e.to_string())?;
-
-        screenshot_texture
-            .update(
-                Rect::new(0, 0, GRID_X_SIZE, GRID_Y_SIZE),
-                &scaled_pixels,
-                GRID_X_SIZE as usize * 4,
-            )
-            .map_err(|e| e.to_string())?;
-
-        screenshot_surface.copy(
-            &screenshot_texture,
-            Rect::new(0, 0, GRID_X_SIZE, GRID_Y_SIZE),
-            Rect::new(0, 0, GRID_X_SIZE, GRID_Y_SIZE),
-        )?;
-
-        screenshot_surface.into_surface().save("screenshot.png")?;
-        println!("saved to screenshot.png");
-
-        Ok(())
-    }
-
     pub fn draw(&mut self, context: &Context) -> Result<(), String> {
         let image_background_path = context
             .show_background_image
@@ -146,7 +93,7 @@ impl Renderer {
 
         if self.screenshot_next_frame {
             self.screenshot_next_frame = false;
-            self.screenshot()?;
+            screenshot::screenshot(&self.canvas, self.pixel_scale, &context.level_path)?;
         }
 
         self.draw_hud_text(context)?;
