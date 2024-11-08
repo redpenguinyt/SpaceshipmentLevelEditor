@@ -1,6 +1,6 @@
 # Spaceshipment level editor
 
-This is the source code of the level editor for [Spaceshipment](https://redpenguin777.itch.io/spaceshipment)
+This is the source code of the level editor for [Spaceshipment](https://renpenguin.itch.io/spaceshipment)
 
 Currently, the editor opens into the last file in the levels folder (sorted alphabetically). To open a different level, use `Ctrl+O`
 
